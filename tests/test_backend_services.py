@@ -4,6 +4,7 @@ from backend.database import init_db
 from backend.services import (
     build_rag_index,
     ensure_merged_graph,
+    get_graph,
     initialize_app_data,
     integration_stats,
     list_textbooks,
@@ -16,9 +17,12 @@ def test_sample_textbooks_and_graphs_load() -> None:
     textbooks = list_textbooks()
     assert len(textbooks) >= 7
     assert all(book["chapter_count"] > 0 for book in textbooks[:7])
+    source_graph = get_graph(textbooks[0]["id"])
+    assert any(edge["relation_type"] == "contains" for edge in source_graph["edges"])
     graph = ensure_merged_graph()
     assert graph["nodes"]
     assert graph["stats"]["node_count"] > 0
+    assert any(edge["relation_type"] == "contains" for edge in graph["edges"])
 
 
 def test_rag_chunks_are_generated() -> None:

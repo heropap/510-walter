@@ -183,7 +183,7 @@ def load_chapters_from_split_dir(textbook_id: str, split_path: Path) -> list[dic
     if not split_path.exists():
         return []
     files = [path for path in split_path.rglob("*.md") if path.name != "00_总目录.md"]
-    files.sort(key=lambda path: str(path.relative_to(split_path)))
+    files.sort(key=lambda path: tuple("" if part == "index.md" else part for part in path.relative_to(split_path).parts))
     path_to_id: dict[str, str] = {}
     chapters: list[dict[str, Any]] = []
     for order, path in enumerate(files, start=1):
@@ -528,7 +528,9 @@ def ensure_graphs_for_all() -> None:
     for textbook in list_textbooks():
         with db() as conn:
             count = conn.execute("SELECT COUNT(*) FROM nodes WHERE textbook_id = ?", (textbook["id"],)).fetchone()[0]
-        if count == 0 and textbook.get("chapter_count", 0) > 0:
+            parent_count = conn.execute("SELECT COUNT(*) FROM chapters WHERE textbook_id = ? AND parent_id IS NOT NULL", (textbook["id"],)).fetchone()[0]
+            contains_count = conn.execute("SELECT COUNT(*) FROM edges WHERE textbook_id = ? AND relation_type = 'contains'", (textbook["id"],)).fetchone()[0]
+        if textbook.get("chapter_count", 0) > 0 and (count == 0 or (parent_count > 0 and contains_count == 0)):
             build_textbook_graph(textbook["id"])
 
 
