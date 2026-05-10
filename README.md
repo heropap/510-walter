@@ -1,3 +1,25 @@
+---
+# 详细文档见https://modelscope.cn/docs/%E5%88%9B%E7%A9%BA%E9%97%B4%E5%8D%A1%E7%89%87
+domain: #领域：cv/nlp/audio/multi-modal/AutoML
+# - nlp
+tags: #自定义标签
+-
+datasets: #关联数据集
+  evaluation:
+  #- iic/ICDAR13_HCTR_Dataset
+  test:
+  #- iic/MTWI
+  train:
+  #- iic/SIBR
+models: #关联模型
+#- iic/ofa_ocr-recognition_general_base_zh
+
+## 启动文件(若SDK为Gradio/Streamlit，默认为app.py, 若为Static HTML, 默认为index.html)
+# deployspec:
+#   entry_file: app.py
+license: Apache License 2.0
+---
+
 # 学科知识整合智能体
 
 FastAPI + React/Vite + D3 的全栈教材整合应用，用 7 本医学教材生成可交互知识图谱、整合决策、RAG 问答和学习材料样例。
