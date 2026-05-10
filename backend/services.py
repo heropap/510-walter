@@ -234,6 +234,7 @@ def fallback_full_text_chapter(textbook_id: str, markdown_path: Path) -> list[di
 
 
 async def handle_upload(file: UploadFile) -> dict[str, Any]:
+    """Import one uploaded textbook, rebuild graph/integration/RAG state, and return import stats."""
     settings = get_settings()
     filename = Path(file.filename or "uploaded.md").name
     safe_stem = re.sub(r"[^\w\u4e00-\u9fff.-]+", "_", Path(filename).stem)
@@ -419,6 +420,7 @@ def classify_node(title: str, content: str, textbook_title: str) -> dict[str, st
 
 
 def build_textbook_graph(textbook_id: str) -> dict[str, Any]:
+    """Build the source graph for one textbook from chapters plus definition-sentence candidates."""
     with db() as conn:
         textbook = conn.execute("SELECT * FROM textbooks WHERE id = ?", (textbook_id,)).fetchone()
         if not textbook:
@@ -689,6 +691,7 @@ def insert_merged_node(
 
 
 def ensure_merged_graph() -> dict[str, Any]:
+    """Recompute the cross-textbook merged graph while applying teacher decision overrides."""
     with db() as conn:
         raw_nodes = conn.execute("SELECT * FROM nodes WHERE textbook_id IS NOT NULL").fetchall()
         raw_edges = conn.execute("SELECT * FROM edges WHERE textbook_id IS NOT NULL").fetchall()
@@ -1406,6 +1409,7 @@ async def rag_query(question: str, conversation_id: str | None = None) -> dict[s
 
 
 async def chat_message(session_id: str, message: str) -> dict[str, Any]:
+    """Persist a teacher message, route decision intents, and fall back to RAG for open questions."""
     with db() as conn:
         conn.execute("INSERT INTO chat_messages (session_id,role,content) VALUES (?,?,?)", (session_id, "user", message))
     normalized = message.strip()
@@ -1518,6 +1522,7 @@ def game_level(level_id: str) -> dict[str, Any]:
 
 
 def generate_report() -> str:
+    """Generate and persist the Markdown integration report used by the API and static handoff."""
     stats = integration_stats()
     textbooks = list_textbooks()
     decisions = list_decisions()[:12]

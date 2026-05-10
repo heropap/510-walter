@@ -29,7 +29,7 @@ graph TD
 | 模块 | 职责 | 输入 | 输出 |
 | --- | --- | --- | --- |
 | Orchestrator | 统一调度上传、图谱、整合、RAG 和报告流程 | API 请求 | 任务结果和状态 |
-| Parser Tool | 文件保存、格式转换、Markdown 章节拆分 | PDF/DOCX/MD/TXT | Textbook + Chapter |
+| Parser Tool | 文件保存、格式转换、Markdown 章节拆分 | MarkItDown 支持格式 + MD/TXT | Textbook + Chapter |
 | Graph Builder Tool | 从章节结构生成知识点节点和关系边 | Chapter | GraphNode + GraphEdge |
 | Merger Tool | 跨教材去重、合并来源、计算压缩比 | 单本图谱 | merged graph + decisions |
 | RAG Tool | chunk 生成、Dify 同步、问答检索 | Chapter + question | answer + citations |
@@ -196,7 +196,7 @@ Dify Chat 应用负责最终生成。应用 prompt 应满足：
 
 ### 8.4 报告采用字符压缩比
 
-页数和版式在 PDF、Markdown、DOCX 之间不可比，字符数是更稳定的统计口径。系统保留原文 chunk 供引用，因此图谱压缩不会破坏 RAG 可追溯性。
+页数和版式在 PDF、Office、HTML、Markdown 等格式之间不可比，字符数是更稳定的统计口径。系统保留原文 chunk 供引用，因此图谱压缩不会破坏 RAG 可追溯性。
 
 ## 9. 创新点
 

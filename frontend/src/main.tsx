@@ -10,6 +10,34 @@ const TEXTBOOK_COLORS = ["#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", 
 const BODY_SYSTEMS = ["全部", "呼吸系统", "循环系统", "消化系统", "神经系统", "免疫系统", "感染病", "全身/通用"];
 const STAGE_ORDER = ["正常结构", "正常功能", "感染传播", "病理形态", "病理生理", "临床应用"];
 const SCALE_ORDER = ["宏观解剖", "器官", "组织", "细胞", "分子", "病原体", "疾病/临床"];
+const SUPPORTED_UPLOAD_EXTENSIONS = [
+  ".md",
+  ".markdown",
+  ".txt",
+  ".pdf",
+  ".docx",
+  ".pptx",
+  ".xls",
+  ".xlsx",
+  ".csv",
+  ".json",
+  ".xml",
+  ".html",
+  ".htm",
+  ".epub",
+  ".zip",
+  ".msg",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".bmp",
+  ".tif",
+  ".tiff",
+  ".mp3",
+  ".wav"
+].join(",");
+const SUPPORTED_UPLOAD_FORMATS = "支持 Markdown/TXT、PDF、Word、PowerPoint、Excel、CSV/JSON/XML、HTML、EPUB、ZIP、Outlook MSG、图片和音频。";
 const CATEGORY_SYMBOLS: Record<string, d3.SymbolType> = {
   疾病: d3.symbolTriangle,
   解剖结构: d3.symbolCircle,
@@ -329,10 +357,10 @@ function TextbookPanel({
       </div>
       <label className={`upload-box ${importing ? "busy" : ""}`} aria-busy={importing}>
         <UploadCloud size={22} />
-        <span>{importing ? "正在导入..." : "上传 PDF / DOCX / Excel / MD"}</span>
+        <span>{importing ? "正在导入..." : "上传 MarkItDown 支持格式"}</span>
         <input
           type="file"
-          accept=".md,.markdown,.txt,.pdf,.docx,.xlsx,.xls,.csv"
+          accept={SUPPORTED_UPLOAD_EXTENSIONS}
           disabled={importing}
           onChange={(event) => {
             const file = event.target.files?.[0];
@@ -352,7 +380,7 @@ function TextbookPanel({
           <li className={importing || importState.status === "success" ? "active" : ""}>生成教材知识图谱</li>
           <li className={importing || importState.status === "success" ? "active" : ""}>刷新整合图谱和本地 RAG 索引</li>
         </ol>
-        {importState.message ? <p>{importState.message}</p> : <p className="muted">支持 Markdown、TXT、PDF、DOCX、XLSX/XLS、CSV。</p>}
+        {importState.message ? <p>{importState.message}</p> : <p className="muted">{SUPPORTED_UPLOAD_FORMATS}</p>}
         {importState.fileName ? <small>{importState.fileName}</small> : null}
       </div>
       <div className="book-list">
