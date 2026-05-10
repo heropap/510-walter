@@ -319,7 +319,7 @@ async def handle_upload(file: UploadFile) -> dict[str, Any]:
                     as_json(chapter["metadata"]),
                 ),
             )
-    graph = build_textbook_graph(textbook_id)
+    graph = build_textbook_graph(textbook_id, use_deepseek=True)
     merged_graph = ensure_merged_graph()
     rag_index = build_rag_index(sync_dify=False)
     dify_sync = sync_textbook_to_dify(textbook_id)
@@ -419,20 +419,185 @@ def classify_node(title: str, content: str, textbook_title: str) -> dict[str, st
     }
 
 
-def build_textbook_graph(textbook_id: str) -> dict[str, Any]:
-    """Build the source graph for one textbook from chapters plus definition-sentence candidates."""
+def _text_value(value: Any, fallback: str = "") -> str:
+    if value is None:
+        return fallback
+    text = str(value).strip()
+    return text or fallback
+
+
+def _list_value(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [_text_value(item) for item in value if _text_value(item)]
+    if isinstance(value, str) and value.strip():
+        return [value.strip()]
+    return []
+
+
+def _find_chapter_by_title(chapters: list[dict[str, Any]], refs: list[str]) -> dict[str, Any] | None:
+    if not chapters:
+        return None
+    by_title = {chapter["title"]: chapter for chapter in chapters}
+    for ref in refs:
+        if ref in by_title:
+            return by_title[ref]
+    normalized_refs = [normalize_name(ref) for ref in refs if normalize_name(ref)]
+    for chapter in chapters:
+        normalized_title = normalize_name(chapter["title"])
+        if any(ref and (ref in normalized_title or normalized_title in ref) for ref in normalized_refs):
+            return chapter
+    return chapters[0]
+
+
+def _deepseek_export_dirs(settings: Settings | None = None) -> list[Path]:
+    settings = settings or get_settings()
+    return [
+        settings.root_dir / "deepseek_keyword_cache",
+        settings.output_dir / "deepseek_keyword_cache",
+    ]
+
+
+def _deepseek_report_paths(settings: Settings | None = None) -> list[Path]:
+    settings = settings or get_settings()
+    return [
+        settings.root_dir / "deepseek_keywords.md",
+        settings.output_dir / "deepseek_keywords.md",
+    ]
+
+
+def _deepseek_textbook_ids(textbook_id: str | None, textbook_title: str) -> list[str]:
+    candidates: list[str] = []
+    if textbook_id:
+        candidates.append(textbook_id)
+    for candidate_id, title in TEXTBOOK_TITLES.items():
+        if title == textbook_title and candidate_id not in candidates:
+            candidates.append(candidate_id)
+    return candidates
+
+
+def find_deepseek_keyword_cache_path(
+    textbook_id: str | None,
+    textbook_title: str,
+    settings: Settings | None = None,
+) -> Path | None:
+    for directory in _deepseek_export_dirs(settings):
+        for candidate_id in _deepseek_textbook_ids(textbook_id, textbook_title):
+            path = directory / f"{candidate_id}.json"
+            if path.exists():
+                return path
+    return None
+
+
+def load_deepseek_keyword_cache(
+    textbook_id: str | None,
+    textbook_title: str,
+    limit: int = 30,
+    settings: Settings | None = None,
+) -> dict[str, Any] | None:
+    settings = settings or get_settings()
+    path = find_deepseek_keyword_cache_path(textbook_id, textbook_title, settings)
+    if not path:
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    keywords = payload.get("keywords", [])
+    if not isinstance(keywords, list):
+        return None
+    keywords = [item for item in keywords if isinstance(item, dict) and _text_value(item.get("keyword"))]
+    if not keywords:
+        return None
+    return {
+        "used_llm": True,
+        "provider": "deepseek_export",
+        "model": payload.get("model") or settings.model_name,
+        "keywords": keywords[:limit],
+        "themes": payload.get("themes", []),
+        "textbook_id": payload.get("textbook_id") or textbook_id,
+        "textbook_title": payload.get("textbook_title") or textbook_title,
+        "from_cache": True,
+        "cache_path": str(path),
+    }
+
+
+def find_deepseek_keyword_report_path(settings: Settings | None = None) -> Path | None:
+    for path in _deepseek_report_paths(settings):
+        if path.exists():
+            return path
+    return None
+
+
+def read_deepseek_keyword_report(settings: Settings | None = None) -> tuple[Path, str] | None:
+    path = find_deepseek_keyword_report_path(settings)
+    if not path:
+        return None
+    try:
+        content = path.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    return (path, content) if content else None
+
+
+def deepen_markdown_headings(markdown: str) -> str:
+    lines = []
+    for line in markdown.strip().splitlines():
+        if line.startswith("#"):
+            lines.append(f"#{line}")
+        else:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def deepseek_export_status(settings: Settings | None = None) -> dict[str, Any]:
+    settings = settings or get_settings()
+    cache_by_stem: dict[str, Path] = {}
+    for directory in _deepseek_export_dirs(settings):
+        if not directory.exists():
+            continue
+        for path in sorted(directory.glob("*.json")):
+            cache_by_stem.setdefault(path.stem, path)
+    report_path = find_deepseek_keyword_report_path(settings)
+    return {
+        "keyword_cache_count": len(cache_by_stem),
+        "keyword_cache_books": sorted(cache_by_stem),
+        "keyword_cache_available": bool(cache_by_stem),
+        "report_available": bool(report_path),
+        "report_path": str(report_path) if report_path else None,
+    }
+
+
+def build_textbook_graph(textbook_id: str, use_deepseek: bool = True) -> dict[str, Any]:
+    """Build one textbook graph, using DeepSeek keyword extraction as the primary path when available."""
     with db() as conn:
         textbook = conn.execute("SELECT * FROM textbooks WHERE id = ?", (textbook_id,)).fetchone()
         if not textbook:
             raise HTTPException(status_code=404, detail="Textbook not found")
-        chapters = conn.execute(
-            "SELECT * FROM chapters WHERE textbook_id = ? ORDER BY sort_order",
-            (textbook_id,),
-        ).fetchall()
+        chapters = [
+            dict(row)
+            for row in conn.execute(
+                "SELECT * FROM chapters WHERE textbook_id = ? ORDER BY sort_order",
+                (textbook_id,),
+            ).fetchall()
+        ]
+        textbook_title = textbook["title"]
+
+    llm_result: dict[str, Any] = {"used_llm": False, "keywords": []}
+    if use_deepseek:
+        try:
+            llm_result = DeepSeekClient().extract_keywords(textbook_title, chapters)
+        except Exception as exc:
+            llm_result = {"used_llm": False, "keywords": [], "error": str(exc)}
+    deepseek_keywords = [
+        item for item in llm_result.get("keywords", []) if isinstance(item, dict) and _text_value(item.get("keyword"))
+    ]
+    deepseek_used = bool(use_deepseek and llm_result.get("used_llm") and deepseek_keywords)
+    deepseek_provider = _text_value(llm_result.get("provider"), "deepseek")
+
+    with db() as conn:
         conn.execute("DELETE FROM nodes WHERE textbook_id = ?", (textbook_id,))
         conn.execute("DELETE FROM edges WHERE textbook_id = ?", (textbook_id,))
 
-        textbook_title = textbook["title"]
         chapter_node_ids: dict[str, str] = {}
         sibling_groups: dict[str, list[str]] = defaultdict(list)
         for chapter in chapters:
@@ -456,29 +621,53 @@ def build_textbook_graph(textbook_id: str) -> dict[str, Any]:
                     textbook_id,
                     title,
                     definition,
-                    labels["category"],
+                    "教学章节" if deepseek_used else labels["category"],
                     labels["body_system"],
                     labels["organ"],
                     labels["anatomical_region"],
                     labels["scale_level"],
                     labels["stage"],
-                    labels["importance"],
+                    "low" if deepseek_used else labels["importance"],
                     1,
                     evidence,
                     chapter["id"],
                     title,
                     as_json([textbook_title]),
-                    "rule_from_chapter",
-                    0.74,
-                    as_json({"path": chapter["path"], "char_count": chapter["char_count"]}),
+                    "chapter_structure" if deepseek_used else "rule_from_chapter",
+                    0.68 if deepseek_used else 0.74,
+                    as_json(
+                        {
+                            "path": chapter["path"],
+                            "char_count": chapter["char_count"],
+                            "extraction_provider": deepseek_provider if deepseek_used else "rule",
+                        }
+                    ),
                 ),
             )
-            for index, candidate in enumerate(extract_definition_candidates(title, content, limit=3), start=1):
-                candidate_name = candidate["name"]
-                candidate_definition = candidate["definition"]
-                candidate_evidence = candidate["evidence"]
-                candidate_id = stable_id(textbook_id, chapter["id"], candidate_name, index, prefix="node_def_")
-                candidate_labels = classify_node(candidate_name, candidate_definition, textbook_title)
+            sibling_groups[chapter["parent_id"] or "root"].append(node_id)
+
+        if deepseek_used:
+            seen_keywords: set[str] = set()
+            for index, item in enumerate(deepseek_keywords, start=1):
+                keyword = _text_value(item.get("keyword"))
+                normalized = normalize_name(keyword)
+                if not normalized or normalized in seen_keywords:
+                    continue
+                seen_keywords.add(normalized)
+                aliases = _list_value(item.get("aliases"))
+                chapter_refs = _list_value(item.get("chapter_refs"))[:3]
+                matched_chapter = _find_chapter_by_title(chapters, chapter_refs)
+                evidence = _text_value(item.get("evidence_hint"), _text_value(item.get("reason"), keyword))
+                definition = _text_value(item.get("definition"), compact_evidence(evidence, 140))
+                labels = classify_node(keyword, f"{definition} {evidence}", textbook_title)
+                category = _text_value(item.get("category"), labels["category"])
+                body_system = _text_value(item.get("body_system"), labels["body_system"])
+                scale_level = _text_value(item.get("scale_level"), labels["scale_level"])
+                stage = _text_value(item.get("stage"), labels["stage"])
+                importance = _text_value(item.get("importance"), "medium")
+                if importance not in {"high", "medium", "low"}:
+                    importance = "medium"
+                node_id = stable_id(textbook_id, "deepseek", normalized, prefix="node_llm_")
                 conn.execute(
                     """
                     INSERT INTO nodes (
@@ -488,47 +677,124 @@ def build_textbook_graph(textbook_id: str) -> dict[str, Any]:
                     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     """,
                     (
-                        candidate_id,
-                        textbook_id,
-                        candidate_name,
-                        candidate_definition,
-                        candidate_labels["category"],
-                        candidate_labels["body_system"],
-                        candidate_labels["organ"],
-                        candidate_labels["anatomical_region"],
-                        candidate_labels["scale_level"],
-                        candidate_labels["stage"],
-                        "medium",
-                        1,
-                        candidate_evidence,
-                        chapter["id"],
-                        title,
-                        as_json([textbook_title]),
-                        "rule_definition_sentence",
-                        0.79,
-                        as_json({"path": chapter["path"], "parent_chapter_node": node_id}),
-                    ),
-                )
-                conn.execute(
-                    """
-                    INSERT INTO edges (id,source,target,relation_type,medical_relation_type,description,confidence,evidence,textbook_id,chapter_title,method)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?)
-                    """,
-                    (
-                        stable_id(node_id, candidate_id, "defines", prefix="edge_"),
                         node_id,
-                        candidate_id,
-                        "defines",
-                        "definition_of",
-                        "定义句抽取显示该章节解释了该知识点。",
-                        0.78,
-                        candidate_evidence,
                         textbook_id,
-                        title,
-                        "definition_sentence_rule",
+                        keyword,
+                        compact_evidence(definition, 180),
+                        category,
+                        body_system,
+                        labels["organ"],
+                        labels["anatomical_region"],
+                        scale_level,
+                        stage,
+                        importance,
+                        max(1, len(chapter_refs)),
+                        compact_evidence(evidence, 190),
+                        matched_chapter["id"] if matched_chapter else None,
+                        matched_chapter["title"] if matched_chapter else (chapter_refs[0] if chapter_refs else ""),
+                        as_json([textbook_title]),
+                        "deepseek_primary_keyword",
+                        0.88 if importance == "high" else 0.84,
+                        as_json(
+                            {
+                                "aliases": aliases,
+                                "chapter_refs": chapter_refs,
+                                "reason": item.get("reason", ""),
+                                "model": llm_result.get("model"),
+                                "provider": deepseek_provider,
+                                "cache_path": llm_result.get("cache_path", ""),
+                                "rank": index,
+                            }
+                        ),
                     ),
                 )
-            sibling_groups[chapter["parent_id"] or "root"].append(node_id)
+                if matched_chapter and matched_chapter["id"] in chapter_node_ids:
+                    source = chapter_node_ids[matched_chapter["id"]]
+                    conn.execute(
+                        """
+                        INSERT INTO edges (id,source,target,relation_type,medical_relation_type,description,confidence,evidence,textbook_id,chapter_title,method)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?)
+                        """,
+                        (
+                            stable_id(source, node_id, "deepseek_extracts", prefix="edge_"),
+                            source,
+                            node_id,
+                            "extracts",
+                            "chapter_keyword",
+                            "DeepSeek 从该章节线索中提取该关键词。",
+                            0.86,
+                            compact_evidence(evidence, 160),
+                            textbook_id,
+                            matched_chapter["title"],
+                            "deepseek_primary_keyword",
+                        ),
+                    )
+        else:
+            for chapter in chapters:
+                title = chapter["title"]
+                content = chapter["content"]
+                node_id = chapter_node_ids[chapter["id"]]
+                for index, candidate in enumerate(extract_definition_candidates(title, content, limit=3), start=1):
+                    candidate_name = candidate["name"]
+                    candidate_definition = candidate["definition"]
+                    candidate_evidence = candidate["evidence"]
+                    candidate_id = stable_id(textbook_id, chapter["id"], candidate_name, index, prefix="node_def_")
+                    candidate_labels = classify_node(candidate_name, candidate_definition, textbook_title)
+                    conn.execute(
+                        """
+                        INSERT INTO nodes (
+                          id,textbook_id,name,definition,category,body_system,organ,anatomical_region,
+                          scale_level,stage,importance,frequency,evidence,chapter_id,chapter_title,
+                          source_textbooks,method,confidence,metadata
+                        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                        """,
+                        (
+                            candidate_id,
+                            textbook_id,
+                            candidate_name,
+                            candidate_definition,
+                            candidate_labels["category"],
+                            candidate_labels["body_system"],
+                            candidate_labels["organ"],
+                            candidate_labels["anatomical_region"],
+                            candidate_labels["scale_level"],
+                            candidate_labels["stage"],
+                            "medium",
+                            1,
+                            candidate_evidence,
+                            chapter["id"],
+                            title,
+                            as_json([textbook_title]),
+                            "rule_definition_sentence",
+                            0.79,
+                            as_json(
+                                {
+                                    "path": chapter["path"],
+                                    "parent_chapter_node": node_id,
+                                    "fallback_reason": llm_result.get("error") if use_deepseek else "use_deepseek=false",
+                                }
+                            ),
+                        ),
+                    )
+                    conn.execute(
+                        """
+                        INSERT INTO edges (id,source,target,relation_type,medical_relation_type,description,confidence,evidence,textbook_id,chapter_title,method)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?)
+                        """,
+                        (
+                            stable_id(node_id, candidate_id, "defines", prefix="edge_"),
+                            node_id,
+                            candidate_id,
+                            "defines",
+                            "definition_of",
+                            "定义句抽取显示该章节解释了该知识点。",
+                            0.78,
+                            candidate_evidence,
+                            textbook_id,
+                            title,
+                            "definition_sentence_rule",
+                        ),
+                    )
 
         edge_seen: set[tuple[str, str, str]] = set()
         for chapter in chapters:
@@ -580,17 +846,30 @@ def build_textbook_graph(textbook_id: str) -> dict[str, Any]:
                             "chapter_structure",
                         ),
                     )
-    return get_graph(textbook_id)
+    graph = get_graph(textbook_id)
+    graph["stats"]["extraction_provider"] = deepseek_provider if deepseek_used else "rule"
+    graph["stats"]["deepseek_keyword_count"] = len(deepseek_keywords) if deepseek_used else 0
+    graph["llm"] = llm_result
+    return graph
 
 
-def ensure_graphs_for_all() -> None:
+def ensure_graphs_for_all(use_deepseek: bool = False) -> None:
     for textbook in list_textbooks():
+        export_path = find_deepseek_keyword_cache_path(textbook["id"], textbook["title"])
+        should_use_deepseek = use_deepseek or bool(export_path)
         with db() as conn:
             count = conn.execute("SELECT COUNT(*) FROM nodes WHERE textbook_id = ?", (textbook["id"],)).fetchone()[0]
             parent_count = conn.execute("SELECT COUNT(*) FROM chapters WHERE textbook_id = ? AND parent_id IS NOT NULL", (textbook["id"],)).fetchone()[0]
             contains_count = conn.execute("SELECT COUNT(*) FROM edges WHERE textbook_id = ? AND relation_type = 'contains'", (textbook["id"],)).fetchone()[0]
-        if textbook.get("chapter_count", 0) > 0 and (count == 0 or (parent_count > 0 and contains_count == 0)):
-            build_textbook_graph(textbook["id"])
+            deepseek_node_count = conn.execute(
+                "SELECT COUNT(*) FROM nodes WHERE textbook_id = ? AND method = 'deepseek_primary_keyword'",
+                (textbook["id"],),
+            ).fetchone()[0]
+        needs_export_refresh = bool(export_path) and deepseek_node_count == 0
+        if textbook.get("chapter_count", 0) > 0 and (
+            count == 0 or (parent_count > 0 and contains_count == 0) or needs_export_refresh
+        ):
+            build_textbook_graph(textbook["id"], use_deepseek=should_use_deepseek)
 
 
 def _graph_from_rows(nodes: list[Any], edges: list[Any], stats: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -984,81 +1263,162 @@ class DeepSeekClient:
         return bool(self.settings.deepseek_ready and OpenAI)
 
     def status(self) -> dict[str, Any]:
+        export = deepseek_export_status(self.settings)
         return {
             "configured": bool(self.settings.deepseek_ready),
             "client_available": bool(OpenAI),
             "model": self.settings.model_name,
             "base_url": self.settings.openai_base_url if self.settings.openai_base_url else None,
+            "primary_for_extraction": bool(self.ready or export["keyword_cache_available"]),
+            "export_available": bool(export["keyword_cache_available"] or export["report_available"]),
+            **export,
         }
 
-    def verify_candidates(self, textbook_title: str, candidates: list[dict[str, Any]]) -> dict[str, Any]:
-        """Ask DeepSeek to keep evidence-backed medical concepts and enrich graph labels."""
-        if not self.ready:
-            return {"used_llm": False, "nodes": candidates, "error": "DeepSeek is not configured"}
-        prompt = {
-            "textbook": textbook_title,
-            "candidates": [
-                {
-                    "id": item["id"],
-                    "name": item["name"],
-                    "definition": item["definition"],
-                    "evidence": item["evidence"][:220],
-                }
-                for item in candidates[:12]
-            ],
-        }
+    @staticmethod
+    def _strip_json(content: str) -> dict[str, Any]:
+        text = content.strip()
+        fenced = re.search(r"```(?:json)?\s*(.*?)```", text, flags=re.S)
+        if fenced:
+            text = fenced.group(1).strip()
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            start = text.find("{")
+            end = text.rfind("}")
+            if start >= 0 and end > start:
+                return json.loads(text[start : end + 1])
+            raise
+
+    def _chat_json(self, messages: list[dict[str, str]], max_tokens: int = 6500) -> dict[str, Any]:
+        if not self.ready or not OpenAI:
+            raise RuntimeError("DeepSeek is not configured")
         client = OpenAI(api_key=self.settings.openai_api_key, base_url=self.settings.openai_base_url)
-        response = client.chat.completions.create(
-            model=self.settings.model_name,
-            temperature=0.1,
-            messages=[
+        kwargs: dict[str, Any] = {
+            "model": self.settings.model_name,
+            "temperature": 0.1,
+            "max_tokens": max_tokens,
+            "messages": messages,
+            "response_format": {"type": "json_object"},
+        }
+        try:
+            response = client.chat.completions.create(**kwargs)
+        except Exception as exc:
+            if "response_format" not in str(exc):
+                raise
+            kwargs.pop("response_format", None)
+            response = client.chat.completions.create(**kwargs)
+        content = response.choices[0].message.content or "{}"
+        try:
+            return self._strip_json(content)
+        except json.JSONDecodeError:
+            repair_messages = [
+                {
+                    "role": "system",
+                    "content": "你只负责修复 JSON。只返回合法 JSON 对象，不要输出解释或 Markdown。",
+                },
+                {
+                    "role": "user",
+                    "content": "请修复为合法 JSON；若末尾被截断，删除不完整条目。\n\n" + content[:20_000],
+                },
+            ]
+            repair_kwargs = {
+                **kwargs,
+                "temperature": 0,
+                "messages": repair_messages,
+            }
+            try:
+                repaired = client.chat.completions.create(**repair_kwargs)
+            except Exception as exc:
+                if "response_format" not in str(exc):
+                    raise
+                repair_kwargs.pop("response_format", None)
+                repaired = client.chat.completions.create(**repair_kwargs)
+            return self._strip_json(repaired.choices[0].message.content or "{}")
+
+    @staticmethod
+    def _chapter_digest(textbook_title: str, chapters: list[dict[str, Any]], max_chars: int = 18_000) -> str:
+        lines = [f"教材：{textbook_title}", f"章节数：{len(chapters)}", ""]
+        for index, chapter in enumerate(chapters, start=1):
+            title = chapter["title"]
+            content = chapter["content"] or ""
+            candidates = extract_definition_candidates(title, content, limit=2)
+            if candidates:
+                clues = "；".join(
+                    f"{item['name']}：{compact_evidence(item['definition'], 72)}" for item in candidates
+                )
+            else:
+                clues = compact_evidence(content, 96)
+            lines.append(f"{index}. {title} | 线索：{clues}")
+            if sum(len(line) + 1 for line in lines) >= max_chars:
+                lines.append("（后续章节因上下文长度限制已省略，请基于已给章节线索保守整理。）")
+                break
+        return "\n".join(lines)
+
+    def extract_keywords(
+        self,
+        textbook_title: str,
+        chapters: list[dict[str, Any]],
+        limit: int = 30,
+    ) -> dict[str, Any]:
+        """Use DeepSeek as the primary extractor for graph keywords."""
+        textbook_id = None
+        if chapters and isinstance(chapters[0], dict):
+            textbook_id = _text_value(chapters[0].get("textbook_id")) or None
+        cached = load_deepseek_keyword_cache(textbook_id, textbook_title, limit=limit, settings=self.settings)
+        if cached:
+            return cached
+        if not self.ready:
+            return {"used_llm": False, "keywords": [], "error": "DeepSeek is not configured"}
+        digest = self._chapter_digest(textbook_title, chapters)
+        result = self._chat_json(
+            [
                 {
                     "role": "system",
                     "content": (
-                        "你是医学教材知识图谱构建专家。只返回严格 JSON，不要输出解释或 Markdown。"
-                        "必须遵守防幻觉规则：definition、category、body_system、scale_level、stage 都只能根据 evidence 判断；"
-                        "如果 evidence 不足以支持候选是医学知识点，keep=false；不要补写证据外的新事实。"
+                        "你是医学教材知识图谱关键词提取专家。只返回严格 JSON，不要输出 Markdown。"
+                        "关键词必须基于输入的教材章节标题和线索；不要编造输入外的章节、定义或证据。"
                     ),
                 },
                 {
                     "role": "user",
                     "content": (
-                        "请审核候选知识点，补全 category/body_system/scale_level/stage/importance。\n"
-                        "输出格式 {\"nodes\":[{\"id\":\"...\",\"keep\":true,\"definition\":\"...\","
-                        "\"category\":\"...\",\"body_system\":\"...\",\"scale_level\":\"...\","
-                        "\"stage\":\"...\",\"importance\":\"high|medium|low\",\"reason\":\"...\"}]}。\n\n"
-                        "Few-shot 示例：\n"
-                        "输入：{\"textbook\":\"组织学与胚胎学\",\"candidates\":[{\"id\":\"n1\",\"name\":\"肺泡\","
-                        "\"definition\":\"肺泡是肺进行气体交换的基本结构。\",\"evidence\":\"肺泡是肺进行气体交换的基本结构，由肺泡上皮和毛细血管共同参与气体交换。\"}]}\n"
-                        "输出：{\"nodes\":[{\"id\":\"n1\",\"keep\":true,\"definition\":\"肺泡是肺进行气体交换的基本结构。\","
-                        "\"category\":\"解剖结构\",\"body_system\":\"呼吸系统\",\"scale_level\":\"组织\","
-                        "\"stage\":\"正常结构\",\"importance\":\"high\",\"reason\":\"evidence 明确给出定义和功能。\"}]}\n\n"
-                        "反例：若 evidence 只是章节标题或无法支撑定义，输出 keep=false。\n\n"
-                        "现在请处理：\n"
-                        + json.dumps(prompt, ensure_ascii=False)
+                        f"请以 DeepSeek 作为主要分析方式，为《{textbook_title}》提取 {limit} 个以内核心关键词。\n"
+                        "这些关键词将直接写入知识图谱 nodes 表，因此要优先选择可作为知识图谱节点、RAG 检索入口、教学导航入口的医学概念。\n\n"
+                        "要求：\n"
+                        "1. 合并同义词、缩写和近义表达，放入 aliases。\n"
+                        "2. category 从：解剖结构、生理机制、病理过程、病原体、疾病、诊断治疗、药物治疗、免疫机制、细胞分子、基础概念、教学章节 中选择。\n"
+                        "3. body_system 无法判断时写“全身/通用”。\n"
+                        "4. scale_level 从：宏观解剖、器官、组织、细胞、分子、病原体、疾病/临床、未知 中选择。\n"
+                        "5. stage 从：正常结构、正常功能、感染传播、病理形态、病理生理、临床应用、未知 中选择。\n"
+                        "6. chapter_refs 最多 3 个，必须使用输入里出现的章节标题。\n"
+                        "7. evidence_hint 必须是输入线索中的短语，不要写长段落。\n"
+                        "8. definition 用一句话概括该关键词在本教材中的含义；证据不足时不要硬补事实。\n\n"
+                        "返回 JSON Schema：\n"
+                        "{\"keywords\":[{\"keyword\":\"关键词\",\"aliases\":[\"别名\"],\"definition\":\"一句话定义\","
+                        "\"category\":\"分类\",\"body_system\":\"系统\",\"scale_level\":\"层级\",\"stage\":\"阶段\","
+                        "\"importance\":\"high|medium|low\",\"chapter_refs\":[\"章节标题\"],"
+                        "\"evidence_hint\":\"证据短语\",\"reason\":\"保留原因\"}],\"themes\":[\"主题\"]}\n\n"
+                        "输入：\n"
+                        + digest
                     ),
                 },
             ],
+            max_tokens=7000,
         )
-        content = response.choices[0].message.content or "{}"
-        try:
-            parsed = json.loads(content)
-        except json.JSONDecodeError:
-            parsed = {"raw": content}
-        return {"used_llm": True, "result": parsed}
-
+        keywords = result.get("keywords", [])
+        if not isinstance(keywords, list):
+            keywords = []
+        return {
+            "used_llm": True,
+            "provider": "deepseek",
+            "model": self.settings.model_name,
+            "keywords": keywords[:limit],
+            "themes": result.get("themes", []),
+        }
 
 async def extract_knowledge(textbook_id: str, use_llm: bool = True) -> dict[str, Any]:
-    graph = build_textbook_graph(textbook_id)
-    llm_result: dict[str, Any] = {"used_llm": False}
-    if use_llm:
-        textbook = get_textbook(textbook_id)
-        client = DeepSeekClient()
-        candidates = graph["nodes"][:12]
-        try:
-            llm_result = client.verify_candidates(textbook["title"], candidates)
-        except Exception as exc:  # Keep the product usable even when provider rejects a call.
-            llm_result = {"used_llm": False, "error": str(exc)}
+    graph = build_textbook_graph(textbook_id, use_deepseek=use_llm)
+    llm_result: dict[str, Any] = graph.get("llm", {"used_llm": False})
     ensure_merged_graph()
     return {"status": "ready", "graph": graph, "llm": llm_result}
 
@@ -1556,6 +1916,18 @@ def generate_report() -> str:
             )
     else:
         lines.append("- 当前暂无整合决策。")
+    settings = get_settings()
+    deepseek_report = read_deepseek_keyword_report(settings)
+    if deepseek_report:
+        report_path, report_content = deepseek_report
+        lines.extend(
+            [
+                "",
+                f"> 已合并 DeepSeek 离线关键词导出：`{report_path.name}`。",
+                "",
+                deepen_markdown_headings(report_content),
+            ]
+        )
     lines.extend(
         [
             "",
@@ -1575,7 +1947,6 @@ def generate_report() -> str:
         ]
     )
     report = "\n".join(lines)
-    settings = get_settings()
     for path in [settings.output_dir / "整合报告.md", settings.root_dir / "report" / "整合报告.md"]:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(report, encoding="utf-8")

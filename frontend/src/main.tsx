@@ -252,11 +252,25 @@ function GraphCanvas({
           })
       )
       .on("click", (_event, d) => {
-        onSelect(d);
-        const scale = d3.zoomTransform(svg.node()!).k;
+        node.selectAll("path")
+          .attr("stroke", "#ffffff")
+          .attr("stroke-width", 1.6);
+        d3.select(_event.currentTarget).select("path")
+          .attr("stroke", "#111827")
+          .attr("stroke-width", 3);
+
+        d.fx = d.x;
+        d.fy = d.y;
+        simulation.alphaTarget(0);
+
+        const scale = Math.max(d3.zoomTransform(svg.node()!).k, 1);
         const tx = width / 2 - (d.x || 0) * scale;
         const ty = height / 2 - (d.y || 0) * scale;
-        svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+        svg.transition().duration(500).ease(d3.easeCubicOut)
+          .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale))
+          .on("end", () => { d.fx = null; d.fy = null; });
+
+        onSelect(d);
         if ((childIdsByParent.get(d.id) || []).some((childId) => scopedNodeIds.has(childId))) {
           onToggleNode(d.id);
         }
@@ -266,8 +280,8 @@ function GraphCanvas({
       .append("path")
       .attr("d", symbol)
       .attr("fill", (d) => (d.source_textbooks?.length > 1 ? "#ff6b6b" : color(d.source_textbooks?.[0] || "整合")))
-      .attr("stroke", (d) => (selected?.id === d.id ? "#111827" : "#ffffff"))
-      .attr("stroke-width", (d) => (selected?.id === d.id ? 3 : 1.6));
+      .attr("stroke", "#ffffff")
+      .attr("stroke-width", 1.6);
 
     const expandableNode = node.filter((d) => (childIdsByParent.get(d.id) || []).some((childId) => scopedNodeIds.has(childId)));
 
@@ -328,7 +342,7 @@ function GraphCanvas({
     return () => {
       simulation.stop();
     };
-  }, [graph, query, bodySystem, expansionDepth, expandedNodeIds, selected, onSelect, onToggleNode]);
+  }, [graph, query, bodySystem, expansionDepth, expandedNodeIds, onSelect, onToggleNode]);
 
   return <svg ref={ref} className="graph-svg" role="img" aria-label="知识图谱"></svg>;
 }
@@ -349,6 +363,7 @@ function TextbookPanel({
   stats: Record<string, number | boolean> | null;
 }) {
   const importing = importState.status === "running";
+
   return (
     <aside className="left-panel">
       <div className="panel-heading">
@@ -950,6 +965,11 @@ function App() {
     setExpandedGraphNodeIds(new Set());
   }
 
+  const hasDeepseekConfig = Boolean(config?.deepseek.configured);
+  const hasDeepseekExport = Boolean(config?.deepseek.export_available);
+  const deepseekAvailable = hasDeepseekConfig || hasDeepseekExport;
+  const deepseekLabel = hasDeepseekConfig && hasDeepseekExport ? "配置+导出" : hasDeepseekConfig ? "已配置" : hasDeepseekExport ? "导出已应用" : "未配置";
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -961,7 +981,7 @@ function App() {
           </div>
         </div>
         <div className="status-group">
-          <StatusPill ok={Boolean(config?.deepseek.configured)}>DeepSeek {config?.deepseek.configured ? "已配置" : "未配置"}</StatusPill>
+          <StatusPill ok={deepseekAvailable}>DeepSeek {deepseekLabel}</StatusPill>
           <StatusPill ok={Boolean(config?.dify.chat_configured)}>Dify {config?.dify.chat_configured ? "已配置" : "等待配置"}</StatusPill>
           <StatusPill ok>{textbooks.length} 本教材</StatusPill>
         </div>

@@ -87,6 +87,13 @@ export interface ConfigStatus {
     client_available: boolean;
     model: string;
     base_url?: string | null;
+    primary_for_extraction?: boolean;
+    export_available?: boolean;
+    keyword_cache_count?: number;
+    keyword_cache_books?: string[];
+    keyword_cache_available?: boolean;
+    report_available?: boolean;
+    report_path?: string | null;
   };
   dify: {
     chat_configured: boolean;

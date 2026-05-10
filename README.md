@@ -139,7 +139,7 @@ DIFY_KNOWLEDGE_API_KEY=dataset-xxxxx
 DIFY_DATASET_ID=dataset-id
 ```
 
-缺少 Dify 时，页面仍可运行，RAG Tab 会显示等待配置并使用本地 chunk 检索提示。缺少 DeepSeek 时，知识图谱使用规则构建，不阻塞核心流程。
+上传教材和手动重建图谱时，DeepSeek 是关键词/知识点的主要提取方式，结果会写入图谱节点；本地规则只负责提供章节线索和 DeepSeek 不可用时的降级。仓库根目录存在 `deepseek_keyword_cache/*.json` 时，系统会优先读取这批 DeepSeek 离线导出作为内置教材图谱节点，不需要现场 API 调用；`deepseek_keywords.md` 会合并进最终整合报告。缺少 Dify 时，页面仍可运行，RAG Tab 会显示等待配置并使用本地 chunk 检索提示。缺少 DeepSeek API 和离线导出时，知识图谱使用规则构建，不阻塞核心流程。
 
 上传转换会优先使用 Python `markitdown` 包，覆盖 PDF、Office、CSV/JSON/XML、HTML、EPUB、ZIP、MSG、图片和音频等常见格式；如果包不存在，会调用 `MARKITDOWN_BIN`，默认可指向 `/Users/walter/.local/bin/markitdown`。
 
