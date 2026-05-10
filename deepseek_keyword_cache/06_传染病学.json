@@ -1,0 +1,427 @@
+{
+  "textbook_id": "06_传染病学",
+  "textbook_title": "传染病学",
+  "keywords": [
+    {
+      "keyword": "传染病学",
+      "aliases": [],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "总论"
+      ],
+      "evidence_hint": "传染病学是一门研究各种传染病在机体内外发生、发展、传播、诊断、治疗和预防规律的学科",
+      "reason": "学科定义，核心基础概念"
+    },
+    {
+      "keyword": "感染",
+      "aliases": [
+        "传染"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "感染与免疫"
+      ],
+      "evidence_hint": "感染是病原体和机体之间相互作用、相互斗争的过程",
+      "reason": "传染病学核心过程"
+    },
+    {
+      "keyword": "病原体",
+      "aliases": [
+        "致病微生物"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "传染病的特征"
+      ],
+      "evidence_hint": "每种传染病都是由特异性病原体引起的",
+      "reason": "病因学研究基础"
+    },
+    {
+      "keyword": "传染源",
+      "aliases": [
+        "感染源"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "传染病的流行过程及影响因素"
+      ],
+      "evidence_hint": "传染源是指体内有病原体生存、繁殖并能将病原体排出体外的人和动物",
+      "reason": "流行病学三环节之一"
+    },
+    {
+      "keyword": "免疫",
+      "aliases": [
+        "免疫力"
+      ],
+      "category": "免疫机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "感染与免疫"
+      ],
+      "evidence_hint": "感染是病原体和机体之间相互作用、相互斗争的过程",
+      "reason": "宿主防御核心"
+    },
+    {
+      "keyword": "诊断",
+      "aliases": [
+        "实验室诊断"
+      ],
+      "category": "诊断治疗",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "传染病的诊断"
+      ],
+      "evidence_hint": "敏试验可指导临床治疗方案，而免疫学检查亦可提供重要依据",
+      "reason": "临床实践关键环节"
+    },
+    {
+      "keyword": "治疗",
+      "aliases": [
+        "抗微生物治疗"
+      ],
+      "category": "诊断治疗",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "传染病的治疗"
+      ],
+      "evidence_hint": "各种抗微生物药物的应用指征和方法",
+      "reason": "疾病控制手段"
+    },
+    {
+      "keyword": "预防",
+      "aliases": [
+        "防控"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "传染病的预防"
+      ],
+      "evidence_hint": "传染病的预防也是传染病工作者的一项重要任务",
+      "reason": "公共卫生核心"
+    },
+    {
+      "keyword": "新发感染病",
+      "aliases": [
+        "新发传染病"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "新发感染病"
+      ],
+      "evidence_hint": "目前多数学者习惯上用“新发感染病”指代两者",
+      "reason": "现代传染病学重点"
+    },
+    {
+      "keyword": "病毒性肝炎",
+      "aliases": [
+        "肝炎"
+      ],
+      "category": "疾病",
+      "body_system": "消化系统",
+      "importance": "high",
+      "chapter_refs": [
+        "病毒性肝炎"
+      ],
+      "evidence_hint": "病毒性肝炎是由多种肝炎病毒引起的，以肝脏损害为主的一组全身性传染病",
+      "reason": "常见传染病"
+    },
+    {
+      "keyword": "艾滋病",
+      "aliases": [
+        "AIDS",
+        "获得性免疫缺陷综合征"
+      ],
+      "category": "疾病",
+      "body_system": "免疫系统",
+      "importance": "high",
+      "chapter_refs": [
+        "艾滋病"
+      ],
+      "evidence_hint": "非相关的合并症和并发症是影响患者预后和生存质量的主要原因",
+      "reason": "重大公共卫生问题"
+    },
+    {
+      "keyword": "结核病",
+      "aliases": [
+        "肺结核"
+      ],
+      "category": "疾病",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "结核病"
+      ],
+      "evidence_hint": "结核分枝杆菌是专性需氧菌，最适宜生长温度为37℃",
+      "reason": "历史悠久的传染病"
+    },
+    {
+      "keyword": "霍乱",
+      "aliases": [],
+      "category": "疾病",
+      "body_system": "消化系统",
+      "importance": "high",
+      "chapter_refs": [
+        "霍乱"
+      ],
+      "evidence_hint": "人体食入霍乱弧菌后是否发病，取决于自身免疫功能、弧菌的入侵数量和致病力",
+      "reason": "甲类传染病"
+    },
+    {
+      "keyword": "疟疾",
+      "aliases": [
+        "打摆子"
+      ],
+      "category": "疾病",
+      "body_system": "血液系统",
+      "importance": "high",
+      "chapter_refs": [
+        "疟疾"
+      ],
+      "evidence_hint": "疟疾患者和带疟原虫者是间日疟、卵形疟、三日疟和恶性疟的传染源",
+      "reason": "全球重要寄生虫病"
+    },
+    {
+      "keyword": "抗菌药物",
+      "aliases": [
+        "抗生素"
+      ],
+      "category": "药物治疗",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "抗菌药物的临床应用"
+      ],
+      "evidence_hint": "缺乏这些感染证据者均无用药指征",
+      "reason": "治疗核心工具"
+    },
+    {
+      "keyword": "败血症",
+      "aliases": [
+        "血流感染"
+      ],
+      "category": "疾病",
+      "body_system": "血液循环系统",
+      "importance": "high",
+      "chapter_refs": [
+        "败血症"
+      ],
+      "evidence_hint": "未引起明显全身炎症反应者称为菌血症",
+      "reason": "严重感染状态"
+    },
+    {
+      "keyword": "感染性休克",
+      "aliases": [
+        "脓毒性休克"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "感染性休克"
+      ],
+      "evidence_hint": "感染性休克的发病机制复杂，其发生、发展是多种因素相互作用、互为因果的综合结果",
+      "reason": "危重症结局"
+    },
+    {
+      "keyword": "医院感染",
+      "aliases": [
+        "院内感染"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "医院感染"
+      ],
+      "evidence_hint": "细菌是引起医院感染的主要病原体，90%以上的医院感染为细菌所致",
+      "reason": "医疗安全重点"
+    },
+    {
+      "keyword": "病原体种类",
+      "aliases": [
+        "病原微生物类型"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "流行病学特点"
+      ],
+      "evidence_hint": "新发感染病以病毒及细菌为主要病原体，还有真菌、立克次体、衣原体、螺旋体及寄生虫等",
+      "reason": "流行病学基础"
+    },
+    {
+      "keyword": "传播媒介",
+      "aliases": [
+        "媒介"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "流行性与地方性斑疹伤寒"
+      ],
+      "evidence_hint": "人虱是本病的传播媒介，以体虱为主",
+      "reason": "流行环节要素"
+    },
+    {
+      "keyword": "毒素",
+      "aliases": [
+        "内毒素",
+        "外毒素"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "细菌性痢疾"
+      ],
+      "evidence_hint": "内毒素是引起全身反应如发热、毒血症及休克的重要因素",
+      "reason": "致病机制成分"
+    },
+    {
+      "keyword": "细胞凋亡",
+      "aliases": [],
+      "category": "细胞分子",
+      "body_system": "神经系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "流行性乙型脑炎"
+      ],
+      "evidence_hint": "细胞凋亡是乙脑病毒导致神经细胞死亡的普遍机制",
+      "reason": "病毒致病机制"
+    },
+    {
+      "keyword": "机会性感染",
+      "aliases": [],
+      "category": "病理过程",
+      "body_system": "免疫系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "弓形虫病"
+      ],
+      "evidence_hint": "弓形虫感染是艾滋病患者重要的机会性感染之一",
+      "reason": "免疫低下相关"
+    },
+    {
+      "keyword": "微生态学",
+      "aliases": [
+        "感染微生态"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "low",
+      "chapter_refs": [
+        "感染微生态学理论与实践"
+      ],
+      "evidence_hint": "微生态学是研究微生物群的结构、功能及其与生境相互关系的一门生态学分支",
+      "reason": "新兴交叉学科"
+    },
+    {
+      "keyword": "人工肝脏",
+      "aliases": [
+        "人工肝"
+      ],
+      "category": "诊断治疗",
+      "body_system": "消化系统",
+      "importance": "low",
+      "chapter_refs": [
+        "人工肝脏"
+      ],
+      "evidence_hint": "生物型人工肝脏研究的核心部分是细胞源和生物反应器",
+      "reason": "肝衰竭治疗技术"
+    },
+    {
+      "keyword": "血清学诊断",
+      "aliases": [
+        "免疫学诊断"
+      ],
+      "category": "诊断治疗",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "传染病的诊断"
+      ],
+      "evidence_hint": "免疫学检查亦可提供重要依据",
+      "reason": "常用诊断方法"
+    },
+    {
+      "keyword": "储存宿主",
+      "aliases": [
+        "保虫宿主"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "人无形体病"
+      ],
+      "evidence_hint": "动物宿主持续感染是病原体维持自然循环的基本条件",
+      "reason": "疾病生态学"
+    },
+    {
+      "keyword": "抗病毒药物",
+      "aliases": [
+        "抗病毒药"
+      ],
+      "category": "药物治疗",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "病毒性疾病"
+      ],
+      "evidence_hint": "理想的抗病毒药物是能够进入宿主细胞内，选择性抑制杀灭病毒",
+      "reason": "病毒病治疗"
+    },
+    {
+      "keyword": "血吸虫病",
+      "aliases": [
+        "日本血吸虫病"
+      ],
+      "category": "疾病",
+      "body_system": "消化系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "吸虫病"
+      ],
+      "evidence_hint": "日本血吸虫病是日本血吸虫寄生于门静脉系统所引起的疾病",
+      "reason": "重要寄生虫病"
+    },
+    {
+      "keyword": "囊尾蚴病",
+      "aliases": [
+        "囊虫病"
+      ],
+      "category": "疾病",
+      "body_system": "全身/通用",
+      "importance": "low",
+      "chapter_refs": [
+        "囊尾蚴病"
+      ],
+      "evidence_hint": "人既是猪带绦虫的唯一最终宿主，又是其中间宿主",
+      "reason": "人兽共患病"
+    }
+  ],
+  "themes": [
+    "传染病防控",
+    "新发传染病",
+    "病原体与宿主相互作用",
+    "临床诊疗技术",
+    "公共卫生应急"
+  ]
+}

@@ -1,0 +1,448 @@
+{
+  "textbook_id": "01_局部解剖学",
+  "textbook_title": "局部解剖学",
+  "keywords": [
+    {
+      "keyword": "翼点",
+      "aliases": [
+        "pterion"
+      ],
+      "category": "解剖结构",
+      "body_system": "头部",
+      "importance": "high",
+      "chapter_refs": [
+        "概述"
+      ],
+      "evidence_hint": "位于颧弓中点上方约二横指处，多呈 H 形",
+      "reason": "翼点是颅骨重要标志，临床颅脑手术关键定位点"
+    },
+    {
+      "keyword": "面神经",
+      "aliases": [
+        "facial nerve"
+      ],
+      "category": "解剖结构",
+      "body_system": "头部",
+      "importance": "high",
+      "chapter_refs": [
+        "面部"
+      ],
+      "evidence_hint": "面肌的运动神经是面神经的分支",
+      "reason": "面神经支配面部表情肌，损伤导致面瘫"
+    },
+    {
+      "keyword": "三叉神经",
+      "aliases": [
+        "trigeminal nerve"
+      ],
+      "category": "解剖结构",
+      "body_system": "头部",
+      "importance": "high",
+      "chapter_refs": [
+        "面部"
+      ],
+      "evidence_hint": "面部的感觉神经为三叉神经",
+      "reason": "三叉神经是面部主要感觉神经，其痛症常见"
+    },
+    {
+      "keyword": "颈筋膜",
+      "aliases": [
+        "cervical fascia"
+      ],
+      "category": "解剖结构",
+      "body_system": "颈部",
+      "importance": "high",
+      "chapter_refs": [
+        "颈部的层次结构"
+      ],
+      "evidence_hint": "颈筋膜 cervical fascia 是位于浅筋膜和颈阔肌深面的深筋膜",
+      "reason": "颈筋膜是颈部层次划分的基础，临床颈部分区重要"
+    },
+    {
+      "keyword": "颈袢",
+      "aliases": [
+        "cervical ansa"
+      ],
+      "category": "解剖结构",
+      "body_system": "颈部",
+      "importance": "medium",
+      "chapter_refs": [
+        "胸锁乳突肌区和颈根部"
+      ],
+      "evidence_hint": "1. 颈袢 cervical ansa 由第 1 ~ 3 颈神经前支的分支构成",
+      "reason": "颈袢是颈部神经吻合，临床颈神经阻滞参考"
+    },
+    {
+      "keyword": "臂丛",
+      "aliases": [
+        "brachial plexus"
+      ],
+      "category": "解剖结构",
+      "body_system": "神经系统",
+      "importance": "high",
+      "chapter_refs": [
+        "颈外侧区",
+        "肩部"
+      ],
+      "evidence_hint": "臂丛与锁骨下动脉均由椎前筋膜形成的筋膜鞘包绕",
+      "reason": "臂丛是上肢神经起源，麻醉和损伤诊断关键"
+    },
+    {
+      "keyword": "肋弓",
+      "aliases": [
+        "costal arch"
+      ],
+      "category": "解剖结构",
+      "body_system": "胸部",
+      "importance": "medium",
+      "chapter_refs": [
+        "概述"
+      ],
+      "evidence_hint": "6. 肋弓 costal arch 肋弓是肝、胆囊和脾的触诊标志",
+      "reason": "肋弓是腹部脏器触诊的重要体表标志"
+    },
+    {
+      "keyword": "膈",
+      "aliases": [
+        "diaphragm"
+      ],
+      "category": "解剖结构",
+      "body_system": "胸部",
+      "importance": "high",
+      "chapter_refs": [
+        "膈"
+      ],
+      "evidence_hint": "胸肋三角和腰肋三角是膈疝的好发部位",
+      "reason": "膈是呼吸主要肌，疝好发部位有临床意义"
+    },
+    {
+      "keyword": "胸膜",
+      "aliases": [
+        "pleura"
+      ],
+      "category": "解剖结构",
+      "body_system": "胸部",
+      "importance": "high",
+      "chapter_refs": [
+        "胸膜和胸膜腔"
+      ],
+      "evidence_hint": "胸膜 pleura 分为脏胸膜和壁胸膜",
+      "reason": "胸膜是胸腔重要结构，胸腔穿刺和胸膜疾病基础"
+    },
+    {
+      "keyword": "肺",
+      "aliases": [
+        "lung"
+      ],
+      "category": "解剖结构",
+      "body_system": "胸部",
+      "importance": "high",
+      "chapter_refs": [
+        "肺"
+      ],
+      "evidence_hint": "肺 lung 位于胸腔内膈的上方、纵隔两侧",
+      "reason": "肺是呼吸器官，位置和分区对手术定位重要"
+    },
+    {
+      "keyword": "纵隔",
+      "aliases": [
+        "mediastinum"
+      ],
+      "category": "解剖结构",
+      "body_system": "胸部",
+      "importance": "medium",
+      "chapter_refs": [
+        "纵隔"
+      ],
+      "evidence_hint": "纵隔左侧面可看到若干大动脉，故又称为动脉侧",
+      "reason": "纵隔是胸部各器官集中区域，肿瘤和感染重要"
+    },
+    {
+      "keyword": "胸腺",
+      "aliases": [
+        "thymus"
+      ],
+      "category": "解剖结构",
+      "body_system": "免疫系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "纵隔"
+      ],
+      "evidence_hint": "胸腺 thymus 由左、右两叶构成",
+      "reason": "胸腺是免疫器官，儿童期重要，纵隔占位鉴别"
+    },
+    {
+      "keyword": "腹部",
+      "aliases": [
+        "abdomen"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "概述"
+      ],
+      "evidence_hint": "腹部 abdomen 是躯干的一部分，位于胸部和盆部之间",
+      "reason": "腹部是躯干核心区域，包含多个重要脏器"
+    },
+    {
+      "keyword": "腹股沟韧带",
+      "aliases": [
+        "inguinal ligament"
+      ],
+      "category": "解剖结构",
+      "body_system": "腹部",
+      "importance": "medium",
+      "chapter_refs": [
+        "腹前外侧壁"
+      ],
+      "evidence_hint": "在腹股沟韧带下方约一横指处与股前区阔筋膜愈合",
+      "reason": "腹股沟韧带是腹股沟管和股管重要边界"
+    },
+    {
+      "keyword": "肝十二指肠韧带",
+      "aliases": [
+        "hepatoduodenal ligament"
+      ],
+      "category": "解剖结构",
+      "body_system": "腹部",
+      "importance": "medium",
+      "chapter_refs": [
+        "结肠上区"
+      ],
+      "evidence_hint": "至十二指肠上部，称肝十二指肠韧带",
+      "reason": "肝十二指肠韧带内含胆总管、肝动脉和门静脉，手术关键"
+    },
+    {
+      "keyword": "十二指肠",
+      "aliases": [
+        "duodenum"
+      ],
+      "category": "解剖结构",
+      "body_system": "腹部",
+      "importance": "high",
+      "chapter_refs": [
+        "结肠上区",
+        "腹膜后间隙"
+      ],
+      "evidence_hint": "十二指肠和胰的大部分位于腹膜后间隙",
+      "reason": "十二指肠是消化和腹膜后重要结构，手术注意保护"
+    },
+    {
+      "keyword": "腹膜后间隙",
+      "aliases": [
+        "retroperitoneal space"
+      ],
+      "category": "解剖结构",
+      "body_system": "腹部",
+      "importance": "medium",
+      "chapter_refs": [
+        "腹膜后间隙"
+      ],
+      "evidence_hint": "内侧部为十二指肠降部",
+      "reason": "腹膜后间隙是重要脏器和血管所在，肾手术区域"
+    },
+    {
+      "keyword": "盆膈",
+      "aliases": [
+        "pelvic diaphragm"
+      ],
+      "category": "解剖结构",
+      "body_system": "盆部",
+      "importance": "medium",
+      "chapter_refs": [
+        "盆部解剖操作"
+      ],
+      "evidence_hint": "盆膈由肛提肌、尾骨肌和盆膈上、下筋膜共同组成",
+      "reason": "盆膈是盆底主要支撑结构，影响盆腔脏器固定"
+    },
+    {
+      "keyword": "会阴",
+      "aliases": [
+        "perineum"
+      ],
+      "category": "解剖结构",
+      "body_system": "盆部",
+      "importance": "high",
+      "chapter_refs": [
+        "会阴"
+      ],
+      "evidence_hint": "会阴 perineum 指盆膈以下封闭骨盆下口的全部软组织",
+      "reason": "会阴是尿道、阴道和肛门所在，外科手术重要区域"
+    },
+    {
+      "keyword": "脊柱区",
+      "aliases": [
+        "vertebral region"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "脊柱区"
+      ],
+      "evidence_hint": "脊柱区包括整个躯干和颈部后面",
+      "reason": "脊柱区覆盖脊柱和背部肌肉，临床腰背痛常见"
+    },
+    {
+      "keyword": "背阔肌",
+      "aliases": [
+        "latissimus dorsi"
+      ],
+      "category": "解剖结构",
+      "body_system": "背部",
+      "importance": "medium",
+      "chapter_refs": [
+        "层次结构"
+      ],
+      "evidence_hint": "背阔肌是位于胸背区下部和腰区浅层较宽大的扁肌",
+      "reason": "背阔肌是背部最大肌，相关皮瓣和功能重要"
+    },
+    {
+      "keyword": "肘正中静脉",
+      "aliases": [
+        "median cubital vein"
+      ],
+      "category": "解剖结构",
+      "body_system": "上肢",
+      "importance": "medium",
+      "chapter_refs": [
+        "肘部"
+      ],
+      "evidence_hint": "肘前区的浅静脉，特别是肘正中静脉是临床静脉取血的常用静脉",
+      "reason": "肘正中静脉是临床常见采血和输液部位"
+    },
+    {
+      "keyword": "正中神经",
+      "aliases": [
+        "median nerve"
+      ],
+      "category": "解剖结构",
+      "body_system": "上肢",
+      "importance": "high",
+      "chapter_refs": [
+        "肘部"
+      ],
+      "evidence_hint": "中神经 median nerve 越过尺血管前方，穿行于旋前圆肌两头之间",
+      "reason": "正中神经支配前臂屈肌和手部重要功能，易受损伤"
+    },
+    {
+      "keyword": "下肢",
+      "aliases": [
+        "lower limb"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "概述"
+      ],
+      "evidence_hint": "下肢 lower limb 除具有行走和运动的功能外，还可使身体直立和支持体重",
+      "reason": "下肢是负重和运动肢体，解剖结构复杂"
+    },
+    {
+      "keyword": "臀筋膜",
+      "aliases": [
+        "gluteal fascia"
+      ],
+      "category": "解剖结构",
+      "body_system": "下肢",
+      "importance": "low",
+      "chapter_refs": [
+        "臀部"
+      ],
+      "evidence_hint": "臀筋膜损伤是腰腿痛的病因之一",
+      "reason": "臀筋膜与腰腿痛相关，临床常见"
+    },
+    {
+      "keyword": "股环",
+      "aliases": [
+        "femoral ring"
+      ],
+      "category": "解剖结构",
+      "body_system": "下肢",
+      "importance": "low",
+      "chapter_refs": [
+        "下肢的解剖操作"
+      ],
+      "evidence_hint": "股环，用小指顺股静脉内侧向上探查，可通向股环",
+      "reason": "股环是股疝发生部位，临床重要意义"
+    },
+    {
+      "keyword": "腘动脉",
+      "aliases": [
+        "popliteal artery"
+      ],
+      "category": "解剖结构",
+      "body_system": "下肢",
+      "importance": "medium",
+      "chapter_refs": [
+        "临床病例分析"
+      ],
+      "evidence_hint": "如果要判断腘动脉及其终末动脉是否发生损伤",
+      "reason": "腘动脉是下肢主要动脉，损伤可致肢体缺血"
+    },
+    {
+      "keyword": "胸锁乳突肌区",
+      "aliases": [
+        "sternocleidomastoid region"
+      ],
+      "category": "解剖结构",
+      "body_system": "颈部",
+      "importance": "medium",
+      "chapter_refs": [
+        "胸锁乳突肌区和颈根部"
+      ],
+      "evidence_hint": "胸锁乳突肌区 sternocleidomastoid region 是指该肌在颈部所占据和覆盖的区域",
+      "reason": "胸锁乳突肌区是颈部重要标志，内含颈动脉鞘"
+    },
+    {
+      "keyword": "颏下三角",
+      "aliases": [
+        "submental triangle"
+      ],
+      "category": "解剖结构",
+      "body_system": "颈部",
+      "importance": "medium",
+      "chapter_refs": [
+        "颈前区"
+      ],
+      "evidence_hint": "颏下三角 submental triangle 是由左、右二腹肌前腹与舌骨体围成的三角区",
+      "reason": "颏下三角是颈部手术的重要解剖区域"
+    },
+    {
+      "keyword": "前列腺",
+      "aliases": [
+        "prostate"
+      ],
+      "category": "解剖结构",
+      "body_system": "男性生殖系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "临床病例分析"
+      ],
+      "evidence_hint": "直肠指检：前列腺Ⅱ度肿大，表面光滑，无压痛，质硬，中央沟消失",
+      "reason": "前列腺是男性特有器官，直肠指检是重要检查方法"
+    },
+    {
+      "keyword": "Virchow淋巴结",
+      "aliases": [
+        "Virchow node"
+      ],
+      "category": "解剖结构",
+      "body_system": "颈部",
+      "importance": "low",
+      "chapter_refs": [
+        "颈部解剖操作"
+      ],
+      "evidence_hint": "位于左颈根部静脉角处的淋巴结称为 Virchow 淋巴结",
+      "reason": "Virchow淋巴结是胃癌等腹部肿瘤转移的常见部位"
+    }
+  ],
+  "themes": [
+    "临床解剖学标志",
+    "区域解剖",
+    "手术入路相关结构",
+    "神经血管解剖"
+  ]
+}

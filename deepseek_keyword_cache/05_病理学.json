@@ -1,0 +1,307 @@
+{
+  "textbook_id": "05_病理学",
+  "textbook_title": "病理学",
+  "keywords": [
+    {
+      "keyword": "细胞适应",
+      "aliases": [
+        "适应性反应"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞和组织的适应与损伤",
+        "适应"
+      ],
+      "evidence_hint": "正常细胞和组织可以对体内外环境变化等刺激，作出不同的代谢、功能和形态的反应性调整",
+      "reason": "病理学总论核心概念，是理解后续损伤的基础"
+    },
+    {
+      "keyword": "萎缩",
+      "aliases": [
+        "atrophy"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "适应"
+      ],
+      "evidence_hint": "萎缩是指已发育正常的细胞、组织或器官的体积缩小",
+      "reason": "常见适应性改变，与细胞凋亡相关"
+    },
+    {
+      "keyword": "可逆性损伤",
+      "aliases": [
+        "变性"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞可逆性损伤"
+      ],
+      "evidence_hint": "损伤大多数可恢复正常，因此是非致死性、可逆性损伤",
+      "reason": "细胞损伤的早期阶段，与坏死鉴别关键"
+    },
+    {
+      "keyword": "坏死",
+      "aliases": [
+        "细胞坏死"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞不可逆性损伤（细胞死亡）"
+      ],
+      "evidence_hint": "坏死是以酶溶性变化为特点的活体内局部组织中细胞的死亡",
+      "reason": "细胞死亡的经典类型，病理诊断核心形态"
+    },
+    {
+      "keyword": "凋亡",
+      "aliases": [
+        "细胞凋亡",
+        "程序性细胞死亡"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞不可逆性损伤（细胞死亡）",
+        "适应"
+      ],
+      "evidence_hint": "大部分生理性萎缩时细胞数量的减少是通过细胞凋亡实现的",
+      "reason": "程序性细胞死亡，与坏死机制不同，在疾病中重要"
+    },
+    {
+      "keyword": "修复",
+      "aliases": [
+        "repair"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "损伤的修复"
+      ],
+      "evidence_hint": "损伤造成机体部分细胞和组织丧失后，机体对所形成缺损进行修补恢复的过程，称为修复",
+      "reason": "损伤后结局，决定功能恢复程度"
+    },
+    {
+      "keyword": "再生",
+      "aliases": [
+        "regeneration"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "再生"
+      ],
+      "evidence_hint": "干细胞是个体发育过程中产生的具有无限或较长时间自我更新和多向分化能力的一类细胞",
+      "reason": "修复的主要形式之一，与干细胞相关"
+    },
+    {
+      "keyword": "瘢痕",
+      "aliases": [
+        "scar"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "纤维性修复"
+      ],
+      "evidence_hint": "瘢痕组织是指肉芽组织经改建成熟形成的纤维结缔组织",
+      "reason": "纤维性修复的最终产物，影响器官功能"
+    },
+    {
+      "keyword": "充血",
+      "aliases": [
+        "hyperemia"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "充血和淤血"
+      ],
+      "evidence_hint": "生理性充血指局部组织或器官因生理需要和代谢增强而发生的充血",
+      "reason": "血液循环障碍基础类型"
+    },
+    {
+      "keyword": "淤血",
+      "aliases": [
+        "congestion"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "充血和淤血"
+      ],
+      "evidence_hint": "病理性充血指各种病理状态下局部组织或器官发生的充血",
+      "reason": "静脉回流受阻所致，是许多疾病病理改变"
+    },
+    {
+      "keyword": "出血",
+      "aliases": [
+        "hemorrhage"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "出血"
+      ],
+      "evidence_hint": "稍微大（直径为3～5mm）的出血称为紫癜",
+      "reason": "常见病理表现，可导致严重后果"
+    },
+    {
+      "keyword": "血栓形成",
+      "aliases": [
+        "thrombosis"
+      ],
+      "category": "病理过程",
+      "body_system": "心血管系统",
+      "importance": "high",
+      "chapter_refs": [
+        "血栓形成"
+      ],
+      "evidence_hint": "血栓形成的机制是血小板活化和凝血因子被激活，使得血液由流动状态发生凝固",
+      "reason": "心脑血管疾病关键机制"
+    },
+    {
+      "keyword": "栓塞",
+      "aliases": [
+        "embolism"
+      ],
+      "category": "病理过程",
+      "body_system": "心血管系统",
+      "importance": "high",
+      "chapter_refs": [
+        "栓塞"
+      ],
+      "evidence_hint": "在循环血液中出现的不溶于血液的异常物质，随血流运行阻塞血管腔的现象称为栓塞",
+      "reason": "血栓脱落等导致的严重并发症"
+    },
+    {
+      "keyword": "梗死",
+      "aliases": [
+        "infarction"
+      ],
+      "category": "病理过程",
+      "body_system": "心血管系统",
+      "importance": "high",
+      "chapter_refs": [
+        "梗死"
+      ],
+      "evidence_hint": "血管血栓形成导致动脉血流中断或灌流不足是梗死形成的最常见原因",
+      "reason": "局部缺血性坏死，临床常见急症"
+    },
+    {
+      "keyword": "水肿",
+      "aliases": [
+        "edema"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "水肿"
+      ],
+      "evidence_hint": "水肿是指组织间隙内的体液增多",
+      "reason": "常见体征，心肝肾疾病的重要表现"
+    },
+    {
+      "keyword": "炎症",
+      "aliases": [
+        "inflammation"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "炎症",
+        "炎症概述"
+      ],
+      "evidence_hint": "复杂的以防御为主的反应称为炎症反应",
+      "reason": "防御反应基础和病理核心概念"
+    },
+    {
+      "keyword": "急性炎症",
+      "aliases": [
+        "acute inflammation"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "急性炎症"
+      ],
+      "evidence_hint": "血管通透性增加是导致炎症局部液体和蛋白渗出血管的重要原因",
+      "reason": "炎症早期阶段，渗出为特征"
+    },
+    {
+      "keyword": "慢性炎症",
+      "aliases": [
+        "chronic inflammation"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "慢性炎症"
+      ],
+      "evidence_hint": "单核巨噬细胞系统的激活是慢性炎症的一个重要特征",
+      "reason": "持续性炎症，与多种慢性病相关"
+    },
+    {
+      "keyword": "自身免疫病",
+      "aliases": [
+        "autoimmune disease"
+      ],
+      "category": "疾病",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "自身免疫病"
+      ],
+      "evidence_hint": "有些是自身反应性T细胞介导的细胞毒反应",
+      "reason": "免疫系统攻击自身组织，临床常见"
+    },
+    {
+      "keyword": "免疫缺陷病",
+      "aliases": [
+        "immunodeficiency",
+        "艾滋病"
+      ],
+      "category": "疾病",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "免疫缺陷病"
+      ],
+      "evidence_hint": "本病是由HIV侵袭机体造成的感染",
+      "reason": "免疫功能低下导致继发性感染和肿瘤"
+    },
+    {
+      "keyword": "肿瘤",
+      "aliases": [
+        "neoplasm",
+        "新生物"
+      ],
+      "category": "疾病",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "肿瘤",
+        "肿瘤的概念"
+      ],
+      "evidence_hint": "肿瘤形成是在各种致瘤因素作用下，细胞生长调控发生严重紊乱的结果",
+      "reason": "肿瘤病理学核心，发病率高"
+    }
+  ]
+}

@@ -1,0 +1,462 @@
+{
+  "textbook_id": "04_医学微生物学",
+  "textbook_title": "医学微生物学",
+  "keywords": [
+    {
+      "keyword": "细菌",
+      "aliases": [
+        "细菌 cell"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细菌的形态与结构",
+        "细菌的生理"
+      ],
+      "evidence_hint": "观察细菌最常用的仪器是光学显微镜",
+      "reason": "细菌是医学微生物学的核心研究对象"
+    },
+    {
+      "keyword": "病毒",
+      "aliases": [
+        "病毒 particles"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "病毒的基本性状",
+        "病毒的感染与免疫"
+      ],
+      "evidence_hint": "病毒是活细胞内寄生的微生物",
+      "reason": "病毒是重要病原体"
+    },
+    {
+      "keyword": "真菌",
+      "aliases": [
+        "霉菌",
+        "酵母"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "真菌学总论",
+        "主要病原性真菌"
+      ],
+      "evidence_hint": "真菌是一个独立的生物类群",
+      "reason": "真菌感染常见"
+    },
+    {
+      "keyword": "消毒灭菌",
+      "aliases": [
+        "消毒",
+        "灭菌"
+      ],
+      "category": "诊断治疗",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "消毒灭菌与病原微生物实验室",
+        "消毒与灭菌"
+      ],
+      "evidence_hint": "用于消毒的化学药品称为消毒剂",
+      "reason": "控制感染的基础"
+    },
+    {
+      "keyword": "感染",
+      "aliases": [
+        "传染"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细菌的感染与免疫",
+        "感染的发生与发展"
+      ],
+      "evidence_hint": "细菌对宿主致病的能力称为细菌的致病性",
+      "reason": "感染是疾病核心"
+    },
+    {
+      "keyword": "免疫",
+      "aliases": [
+        "抗感染免疫"
+      ],
+      "category": "免疫机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "宿主的抗感染免疫",
+        "抗病毒免疫"
+      ],
+      "evidence_hint": "抗病毒固有免疫是机体病毒感染的第一道防线",
+      "reason": "免疫防御机制"
+    },
+    {
+      "keyword": "耐药性",
+      "aliases": [
+        "抗生素耐药"
+      ],
+      "category": "诊断治疗",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细菌的耐药性",
+        "细菌的耐药机制"
+      ],
+      "evidence_hint": "细菌对某种抗菌药物由敏感变成耐受的现象称为耐药性变异",
+      "reason": "全球公共卫生威胁"
+    },
+    {
+      "keyword": "抗菌药物",
+      "aliases": [
+        "抗生素",
+        "抗菌药"
+      ],
+      "category": "药物治疗",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "抗菌药物的种类及其作用机制",
+        "细菌的耐药机制"
+      ],
+      "evidence_hint": "亚胺培南与西司他丁合用称为泰能",
+      "reason": "治疗细菌感染的关键"
+    },
+    {
+      "keyword": "病原微生物",
+      "aliases": [
+        "病原体"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "病原微生物实验室生物安全"
+      ],
+      "evidence_hint": "病原微生物实验室生物安全的核心是保护操作人员",
+      "reason": "病原微生物是研究对象"
+    },
+    {
+      "keyword": "致病性",
+      "aliases": [
+        "致病能力"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细菌的致病作用",
+        "病毒的致病作用"
+      ],
+      "evidence_hint": "细菌对宿主致病的能力称为细菌的致病性",
+      "reason": "病原体致病机制"
+    },
+    {
+      "keyword": "毒力",
+      "aliases": [
+        "毒力因子"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "链球菌属",
+        "细菌的致病作用"
+      ],
+      "evidence_hint": "黏附素、荚膜、溶菌酶释放蛋白等是猪链球菌重要的毒力因子",
+      "reason": "决定致病程度"
+    },
+    {
+      "keyword": "遗传变异",
+      "aliases": [
+        "突变",
+        "基因转移"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "细菌的遗传与变异",
+        "细菌变异的机制"
+      ],
+      "evidence_hint": "遗传和变异是细菌的基本属性",
+      "reason": "解释耐药性和进化"
+    },
+    {
+      "keyword": "基因组",
+      "aliases": [
+        "基因"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "细菌基因组",
+        "病毒的遗传与变异"
+      ],
+      "evidence_hint": "基因组由2条环状染色体组成",
+      "reason": "分子基础"
+    },
+    {
+      "keyword": "微生物群",
+      "aliases": [
+        "正常菌群"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "人体微生物群的构成和功能"
+      ],
+      "evidence_hint": "人体微生物群是由来自原核生物、真核生物和病毒的多种微生物构成的复杂群落",
+      "reason": "微生态学重要"
+    },
+    {
+      "keyword": "微生态失调",
+      "aliases": [
+        "菌群失调"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "人体微生物群与疾病",
+        "微生态失调与感染性疾病"
+      ],
+      "evidence_hint": "由生理性组合转变为病理性组合的状态被称为微生态失调",
+      "reason": "多种疾病诱因"
+    },
+    {
+      "keyword": "噬菌体",
+      "aliases": [
+        "细菌病毒"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "噬菌体",
+        "毒性噬菌体",
+        "温和噬菌体"
+      ],
+      "evidence_hint": "噬菌体主要由核酸和蛋白质组成",
+      "reason": "细菌遗传工具"
+    },
+    {
+      "keyword": "内毒素",
+      "aliases": [
+        "脂多糖"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "细菌的结构",
+        "细菌的致病作用"
+      ],
+      "evidence_hint": "羟基豆蔻酸是多数革兰氏阴性菌共有的",
+      "reason": "革兰氏阴性菌致病物质"
+    },
+    {
+      "keyword": "外毒素",
+      "aliases": [
+        "毒素"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "梭菌属",
+        "细菌的致病作用"
+      ],
+      "evidence_hint": "破伤风痉挛毒素和肉毒毒素",
+      "reason": "强毒性蛋白"
+    },
+    {
+      "keyword": "疫苗",
+      "aliases": [
+        "免疫接种"
+      ],
+      "category": "诊断治疗",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "病毒感染的特异性预防",
+        "细菌感染的防治原则"
+      ],
+      "evidence_hint": "疫苗接种是预防甲型肝炎的有效手段",
+      "reason": "预防疾病关键"
+    },
+    {
+      "keyword": "结核分枝杆菌",
+      "aliases": [
+        "结核菌"
+      ],
+      "category": "疾病",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "结核分枝杆菌"
+      ],
+      "evidence_hint": "郭霍首次发现了结核分枝杆菌",
+      "reason": "重要传染病病原"
+    },
+    {
+      "keyword": "人类免疫缺陷病毒",
+      "aliases": [
+        "艾滋病病毒",
+        "HIV"
+      ],
+      "category": "疾病",
+      "body_system": "免疫系统",
+      "importance": "high",
+      "chapter_refs": [
+        "人类免疫缺陷病毒"
+      ],
+      "evidence_hint": "HIV的逆转录酶无校正功能",
+      "reason": "艾滋病病原"
+    },
+    {
+      "keyword": "乙型肝炎病毒",
+      "aliases": [
+        "乙肝病毒",
+        "HBV"
+      ],
+      "category": "疾病",
+      "body_system": "消化系统",
+      "importance": "high",
+      "chapter_refs": [
+        "乙型肝炎病毒"
+      ],
+      "evidence_hint": "HBV是乙型肝炎的病原体",
+      "reason": "慢性肝炎主因"
+    },
+    {
+      "keyword": "冠状病毒",
+      "aliases": [
+        "CoV"
+      ],
+      "category": "病原体",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "冠状病毒"
+      ],
+      "evidence_hint": "主要的结构蛋白是N、S、E和M蛋白",
+      "reason": "引起呼吸道感染，包括COVID-19"
+    },
+    {
+      "keyword": "流感病毒",
+      "aliases": [
+        "流感"
+      ],
+      "category": "病原体",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "正黏病毒"
+      ],
+      "evidence_hint": "流感病毒特别是甲型流感病毒容易发生抗原变异",
+      "reason": "季节性流感"
+    },
+    {
+      "keyword": "肠道病毒",
+      "aliases": [
+        "肠道病毒"
+      ],
+      "category": "病原体",
+      "body_system": "消化系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "肠道病毒"
+      ],
+      "evidence_hint": "病毒衣壳蛋白由VP1、VP2、VP3和VP4组成",
+      "reason": "引起多种疾病"
+    },
+    {
+      "keyword": "衣原体",
+      "aliases": [
+        "衣原体"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "衣原体",
+        "主要致病性衣原体"
+      ],
+      "evidence_hint": "圆形或椭圆形，有细胞壁，革兰氏阴性",
+      "reason": "常见病原体"
+    },
+    {
+      "keyword": "支原体",
+      "aliases": [
+        "支原体"
+      ],
+      "category": "病原体",
+      "body_system": "呼吸系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "支原体",
+        "主要致病性支原体"
+      ],
+      "evidence_hint": "被称为支原体",
+      "reason": "肺炎常见"
+    },
+    {
+      "keyword": "螺旋体",
+      "aliases": [
+        "螺旋体"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "螺旋体",
+        "钩端螺旋体属"
+      ],
+      "evidence_hint": "钩端螺旋体病是典型的人兽共患病",
+      "reason": "人兽共患病"
+    },
+    {
+      "keyword": "立克次体",
+      "aliases": [
+        "立克次体"
+      ],
+      "category": "病原体",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "立克次体",
+        "主要致病性立克次体"
+      ],
+      "evidence_hint": "多西环素是首选药物",
+      "reason": "自然疫源性疾病"
+    },
+    {
+      "keyword": "细菌结构",
+      "aliases": [
+        "细胞壁",
+        "荚膜",
+        "鞭毛"
+      ],
+      "category": "解剖结构",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细菌的形态与结构",
+        "细菌的结构"
+      ],
+      "evidence_hint": "观察细菌最常用的仪器是光学显微镜",
+      "reason": "基础形态学"
+    }
+  ],
+  "themes": [
+    "病原微生物的致病机制",
+    "抗微生物耐药性",
+    "人体微生物群与健康"
+  ]
+}

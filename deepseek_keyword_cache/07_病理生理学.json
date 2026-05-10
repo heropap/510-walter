@@ -1,0 +1,470 @@
+{
+  "textbook_id": "07_病理生理学",
+  "textbook_title": "病理生理学",
+  "keywords": [
+    {
+      "keyword": "病理生理学",
+      "aliases": [
+        "病生"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "绪论"
+      ],
+      "evidence_hint": "病理生理学是连接基础医学与临床医学的重要“桥梁”学科。",
+      "reason": "学科核心概念，贯穿全书。"
+    },
+    {
+      "keyword": "疾病",
+      "aliases": [
+        "疾病状态"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "疾病概论",
+        "健康和疾病"
+      ],
+      "evidence_hint": "疾病（disease）是对应于健康的一种异常生命状态",
+      "reason": "全书研究核心对象。"
+    },
+    {
+      "keyword": "健康",
+      "aliases": [
+        "健康状态"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "健康和疾病"
+      ],
+      "evidence_hint": "衡量一个国家居民健康水平的指标主要包括人均预期寿命、婴儿死亡率和孕产妇死亡率。",
+      "reason": "与疾病相对的重要概念。"
+    },
+    {
+      "keyword": "病因",
+      "aliases": [
+        "病因学"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "病因学基础"
+      ],
+      "evidence_hint": "互传播的一类疾病称为传染性疾病。",
+      "reason": "疾病发生的基础因素。"
+    },
+    {
+      "keyword": "发病机制",
+      "aliases": [
+        "发病学"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "发病学基础"
+      ],
+      "evidence_hint": "对损伤做出抗损伤反应是生物机体的重要特征",
+      "reason": "疾病发展的核心过程。"
+    },
+    {
+      "keyword": "细胞增殖",
+      "aliases": [
+        "细胞分裂",
+        "细胞周期"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "细胞增殖、分化与疾病"
+      ],
+      "evidence_hint": "细胞增殖（cell proliferation）是指细胞分裂及再生的过程。",
+      "reason": "细胞命运调控的基础。"
+    },
+    {
+      "keyword": "细胞分化",
+      "aliases": [
+        "分化"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "细胞增殖、分化与疾病"
+      ],
+      "evidence_hint": "人体从组织到器官的结构形成和功能执行取决于细胞类型、数量和质量",
+      "reason": "组织功能维持的基础。"
+    },
+    {
+      "keyword": "细胞死亡",
+      "aliases": [
+        "凋亡",
+        "坏死",
+        "坏死性凋亡"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞死亡与疾病"
+      ],
+      "evidence_hint": "细胞死亡是细胞停止功能活动的过程",
+      "reason": "多种疾病发生的细胞机制。"
+    },
+    {
+      "keyword": "细胞信号转导",
+      "aliases": [
+        "信号通路",
+        "信号转导"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞信号转导与疾病",
+        "概述"
+      ],
+      "evidence_hint": "细胞信号转导（cell signal transduction）是指细胞通过位于胞膜或胞内的受体，感受细胞外信号",
+      "reason": "细胞功能调控的核心机制。"
+    },
+    {
+      "keyword": "受体",
+      "aliases": [
+        "受体蛋白"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "受体异常与疾病"
+      ],
+      "evidence_hint": "受体的磷酸化和脱磷酸化是调节受体亲和力的重要方式。",
+      "reason": "信号转导的关键元件。"
+    },
+    {
+      "keyword": "衰老",
+      "aliases": [
+        "老化"
+      ],
+      "category": "生理机制",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "衰老与疾病",
+        "概述"
+      ],
+      "evidence_hint": "生长、发育、衰老、死亡是有机体生命过程的基本规律",
+      "reason": "影响多种疾病的重要生物学过程。"
+    },
+    {
+      "keyword": "应激",
+      "aliases": [
+        "应激反应",
+        "应激原"
+      ],
+      "category": "生理机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "应激",
+        "应激与应激原的分类"
+      ],
+      "evidence_hint": "引起机体应激反应的各种因素统称为应激原（stressor）。",
+      "reason": "适应与损伤的桥梁。"
+    },
+    {
+      "keyword": "水钠代谢紊乱",
+      "aliases": [
+        "水电解质紊乱",
+        "钠代谢紊乱"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "水、钠代谢紊乱"
+      ],
+      "evidence_hint": "以离子状态存在于体液中的各种无机盐和有机物称为电解质。",
+      "reason": "临床常见病理过程。"
+    },
+    {
+      "keyword": "钾代谢紊乱",
+      "aliases": [
+        "低钾血症",
+        "高钾血症"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "钾代谢紊乱"
+      ],
+      "evidence_hint": "神经肌肉症状是急性低钾血症的突出表现。",
+      "reason": "影响神经肌肉和心脏功能。"
+    },
+    {
+      "keyword": "酸碱平衡紊乱",
+      "aliases": [
+        "酸中毒",
+        "碱中毒",
+        "混合型酸碱紊乱"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "酸碱平衡紊乱",
+        "单纯型酸碱平衡紊乱",
+        "混合型酸碱平衡紊乱"
+      ],
+      "evidence_hint": "人体的体液环境必须具有适宜的酸碱度才能维持正常的代谢和生理功能",
+      "reason": "维持内环境稳定的关键。"
+    },
+    {
+      "keyword": "糖代谢紊乱",
+      "aliases": [
+        "高血糖",
+        "糖尿病"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "糖代谢紊乱"
+      ],
+      "evidence_hint": "病理性高血糖是指血液中葡萄糖的浓度长期高于正常水平。",
+      "reason": "代谢性疾病核心。"
+    },
+    {
+      "keyword": "脂代谢紊乱",
+      "aliases": [
+        "高脂血症",
+        "血脂异常"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "脂代谢紊乱"
+      ],
+      "evidence_hint": "LPL 是血液中主要的脂解酶，也是清除血浆脂蛋白中甘油三酯的限速酶。",
+      "reason": "心脑血管疾病危险因素。"
+    },
+    {
+      "keyword": "代谢综合征",
+      "aliases": [
+        "MS",
+        "胰岛素抵抗综合征"
+      ],
+      "category": "疾病",
+      "body_system": "全身/通用",
+      "importance": "medium",
+      "chapter_refs": [
+        "代谢综合征"
+      ],
+      "evidence_hint": "代谢综合征的主要防治目标是阻止或延缓其向糖尿病、心血管疾病发展的进程。",
+      "reason": "多种代谢异常聚集的临床状态。"
+    },
+    {
+      "keyword": "缺氧",
+      "aliases": [
+        "低氧",
+        "组织缺氧"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "缺氧",
+        "缺氧的原因、分类和血氧变化的特点"
+      ],
+      "evidence_hint": "致组织代谢、功能和形态结构异常变化的病理过程称为缺氧（hypoxia）。",
+      "reason": "多种疾病共有的基本病理过程。"
+    },
+    {
+      "keyword": "发热",
+      "aliases": [
+        "发烧",
+        "体温升高"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "发热",
+        "病因和发病机制"
+      ],
+      "evidence_hint": "来自体外的致热物质称为外致热原。",
+      "reason": "常见临床症状。"
+    },
+    {
+      "keyword": "缺血-再灌注损伤",
+      "aliases": [
+        "再灌注损伤",
+        "IRI"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "缺血-再灌注损伤",
+        "病因和影响因素"
+      ],
+      "evidence_hint": "此现象称为缺血-再灌注损伤（ischemia-reperfusion injury）。",
+      "reason": "再灌注治疗中的关键问题。"
+    },
+    {
+      "keyword": "休克",
+      "aliases": [
+        "循环衰竭"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "休克",
+        "分期及发生发展机制",
+        "几种常见休克的特点"
+      ],
+      "evidence_hint": "微循环灌流不足是多数休克发生的共同基础。",
+      "reason": "危重症常见病理过程。"
+    },
+    {
+      "keyword": "弥散性血管内凝血",
+      "aliases": [
+        "DIC"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "弥散性血管内凝血"
+      ],
+      "evidence_hint": "常见的严重感染或脓毒症、广泛组织损伤、恶性肿瘤和产科意外等。",
+      "reason": "严重凝血紊乱综合征。"
+    },
+    {
+      "keyword": "心功能不全",
+      "aliases": [
+        "心力衰竭",
+        "心衰"
+      ],
+      "category": "疾病",
+      "body_system": "心血管系统",
+      "importance": "high",
+      "chapter_refs": [
+        "心功能不全",
+        "分类",
+        "发生发展机制"
+      ],
+      "evidence_hint": "心肌收缩性是指不依赖心脏前负荷与后负荷变化的心肌本身的收缩特性。",
+      "reason": "心血管疾病终末阶段。"
+    },
+    {
+      "keyword": "呼吸衰竭",
+      "aliases": [
+        "呼吸功能不全"
+      ],
+      "category": "疾病",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肺功能不全",
+        "病因和发病机制"
+      ],
+      "evidence_hint": "呼吸衰竭则是肺通气和/或肺换气出现严重功能障碍的结果。",
+      "reason": "严重通气或换气障碍。"
+    },
+    {
+      "keyword": "肝功能不全",
+      "aliases": [
+        "肝衰竭",
+        "肝功能障碍"
+      ],
+      "category": "疾病",
+      "body_system": "消化系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肝功能不全",
+        "肝功能不全的病因"
+      ],
+      "evidence_hint": "晚期一般称为肝衰竭（hepatic failure），主要临床表现为肝性脑病及肝肾综合征。",
+      "reason": "严重肝病结果。"
+    },
+    {
+      "keyword": "肾功能不全",
+      "aliases": [
+        "肾衰竭",
+        "肾损伤"
+      ],
+      "category": "疾病",
+      "body_system": "泌尿系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肾功能不全",
+        "急性肾衰竭",
+        "慢性肾衰竭"
+      ],
+      "evidence_hint": "肾衰竭（renal failure）是肾功能不全的晚期阶段。",
+      "reason": "肾脏功能严重减退。"
+    },
+    {
+      "keyword": "认知障碍",
+      "aliases": [
+        "认知功能下降",
+        "痴呆"
+      ],
+      "category": "疾病",
+      "body_system": "神经系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "认知障碍"
+      ],
+      "evidence_hint": "临床上引起认知障碍最常见的神经退行性疾病是阿尔茨海默病",
+      "reason": "神经系统常见功能障碍。"
+    },
+    {
+      "keyword": "意识障碍",
+      "aliases": [
+        "昏迷",
+        "意识模糊"
+      ],
+      "category": "疾病",
+      "body_system": "神经系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "意识障碍"
+      ],
+      "evidence_hint": "累及脑干上行网状激动系统是导致意识障碍的主要机制。",
+      "reason": "危重患者常见表现。"
+    },
+    {
+      "keyword": "多器官功能障碍综合征",
+      "aliases": [
+        "MODS",
+        "多器官衰竭"
+      ],
+      "category": "疾病",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "多器官功能障碍",
+        "MODS 的病因和分类"
+      ],
+      "evidence_hint": "脓毒症（sepsis）是 MODS 患者致死的主要原因。",
+      "reason": "危重症死亡主要原因。"
+    }
+  ],
+  "themes": [
+    "疾病的发生发展机制",
+    "内环境稳态与失衡",
+    "器官功能障碍与全身反应"
+  ]
+}

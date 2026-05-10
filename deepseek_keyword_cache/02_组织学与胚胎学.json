@@ -1,0 +1,476 @@
+{
+  "textbook_id": "02_组织学与胚胎学",
+  "textbook_title": "组织学与胚胎学",
+  "keywords": [
+    {
+      "keyword": "组织学",
+      "aliases": [
+        "histology"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "组织学绪论",
+        "组织学的内容和意义",
+        "组织学的学习方法"
+      ],
+      "evidence_hint": "组织学是研究正常机体微细结构及其相关功能的学科",
+      "reason": "学科核心概念，贯穿全书"
+    },
+    {
+      "keyword": "上皮组织",
+      "aliases": [
+        "上皮",
+        "epithelium"
+      ],
+      "category": "解剖结构",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "上皮组织",
+        "被覆上皮",
+        "腺上皮和腺"
+      ],
+      "evidence_hint": "上皮组织由大量形态规则、排列密集的上皮细胞和极少量的细胞外基质组成",
+      "reason": "四大基本组织之一，覆盖身体表面和腔面"
+    },
+    {
+      "keyword": "结缔组织",
+      "aliases": [
+        "connective tissue"
+      ],
+      "category": "解剖结构",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "结缔组织",
+        "疏松结缔组织",
+        "致密结缔组织"
+      ],
+      "evidence_hint": "结缔组织由细胞和细胞外基质构成",
+      "reason": "四大基本组织之一，支持连接作用"
+    },
+    {
+      "keyword": "肌组织",
+      "aliases": [
+        "muscular tissue"
+      ],
+      "category": "解剖结构",
+      "body_system": "肌肉系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肌组织",
+        "骨骼肌",
+        "心肌"
+      ],
+      "evidence_hint": "肌组织主要由具有收缩功能的肌细胞构成",
+      "reason": "四大基本组织之一，负责运动"
+    },
+    {
+      "keyword": "神经组织",
+      "aliases": [
+        "nervous tissue"
+      ],
+      "category": "解剖结构",
+      "body_system": "神经系统",
+      "importance": "high",
+      "chapter_refs": [
+        "神经组织",
+        "神经元",
+        "神经胶质细胞"
+      ],
+      "evidence_hint": "神经组织由两类细胞—神经元和神经胶质细胞组成",
+      "reason": "四大基本组织之一，调控机体功能"
+    },
+    {
+      "keyword": "细胞",
+      "aliases": [
+        "cell"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "组织学的内容和意义",
+        "组织学的学习方法"
+      ],
+      "evidence_hint": "细胞是人体结构和功能的基本单位",
+      "reason": "组织学研究的起点"
+    },
+    {
+      "keyword": "红细胞",
+      "aliases": [
+        "erythrocyte",
+        "red blood cell"
+      ],
+      "category": "细胞分子",
+      "body_system": "血液系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "红细胞",
+        "血液"
+      ],
+      "evidence_hint": "红细胞在扫描电镜下呈双凹圆盘状",
+      "reason": "血液中最多的细胞成分"
+    },
+    {
+      "keyword": "白细胞",
+      "aliases": [
+        "leukocyte",
+        "white blood cell"
+      ],
+      "category": "细胞分子",
+      "body_system": "血液系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "白细胞",
+        "血液"
+      ],
+      "evidence_hint": "中性粒细胞是数量最多的白细胞",
+      "reason": "免疫防御核心细胞"
+    },
+    {
+      "keyword": "神经元",
+      "aliases": [
+        "nerve cell"
+      ],
+      "category": "解剖结构",
+      "body_system": "神经系统",
+      "importance": "high",
+      "chapter_refs": [
+        "神经元",
+        "神经组织"
+      ],
+      "evidence_hint": "神经元是神经系统的结构和功能单位",
+      "reason": "神经功能的基本单元"
+    },
+    {
+      "keyword": "突触",
+      "aliases": [
+        "synapse"
+      ],
+      "category": "解剖结构",
+      "body_system": "神经系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "突触",
+        "神经元"
+      ],
+      "evidence_hint": "含神经肽的往往是大颗粒型小泡",
+      "reason": "神经元间信号传递关键结构"
+    },
+    {
+      "keyword": "心脏",
+      "aliases": [
+        "heart"
+      ],
+      "category": "解剖结构",
+      "body_system": "循环系统",
+      "importance": "high",
+      "chapter_refs": [
+        "心脏",
+        "循环系统"
+      ],
+      "evidence_hint": "心内膜由内皮和内皮下层构成",
+      "reason": "循环系统动力器官"
+    },
+    {
+      "keyword": "毛细血管",
+      "aliases": [
+        "capillary"
+      ],
+      "category": "解剖结构",
+      "body_system": "循环系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "毛细血管",
+        "微循环"
+      ],
+      "evidence_hint": "毛细血管壁由内皮细胞及其基膜和周细胞构成",
+      "reason": "血液与组织液交换场所"
+    },
+    {
+      "keyword": "免疫细胞",
+      "aliases": [
+        "immune cells"
+      ],
+      "category": "细胞分子",
+      "body_system": "免疫系统",
+      "importance": "high",
+      "chapter_refs": [
+        "主要的免疫细胞",
+        "免疫系统"
+      ],
+      "evidence_hint": "淋巴细胞可分为T淋巴细胞、B淋巴细胞和NK细胞",
+      "reason": "免疫系统功能细胞群"
+    },
+    {
+      "keyword": "皮肤",
+      "aliases": [
+        "skin"
+      ],
+      "category": "解剖结构",
+      "body_system": "皮肤系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "皮肤",
+        "表皮",
+        "真皮"
+      ],
+      "evidence_hint": "皮肤是人体面积最大的器官",
+      "reason": "人体最大器官，屏障功能"
+    },
+    {
+      "keyword": "甲状腺",
+      "aliases": [
+        "thyroid gland"
+      ],
+      "category": "解剖结构",
+      "body_system": "内分泌系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "甲状腺",
+        "内分泌系统"
+      ],
+      "evidence_hint": "甲状腺分左右两叶",
+      "reason": "重要内分泌腺体"
+    },
+    {
+      "keyword": "垂体",
+      "aliases": [
+        "pituitary gland"
+      ],
+      "category": "解剖结构",
+      "body_system": "内分泌系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "垂体",
+        "内分泌系统"
+      ],
+      "evidence_hint": "刺激骺软骨生长",
+      "reason": "内分泌中枢，调节生长"
+    },
+    {
+      "keyword": "消化管",
+      "aliases": [
+        "digestive tract"
+      ],
+      "category": "解剖结构",
+      "body_system": "消化系统",
+      "importance": "high",
+      "chapter_refs": [
+        "消化管",
+        "消化管壁的一般结构"
+      ],
+      "evidence_hint": "消化系统由消化管和消化腺组成",
+      "reason": "消化系统管道部分"
+    },
+    {
+      "keyword": "胃",
+      "aliases": [
+        "stomach"
+      ],
+      "category": "解剖结构",
+      "body_system": "消化系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "胃",
+        "消化管"
+      ],
+      "evidence_hint": "黏膜肌层由内环行与外纵行两薄层平滑肌组成",
+      "reason": "消化管重要器官"
+    },
+    {
+      "keyword": "肝",
+      "aliases": [
+        "liver"
+      ],
+      "category": "解剖结构",
+      "body_system": "消化系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肝",
+        "消化腺"
+      ],
+      "evidence_hint": "窦周隙是肝细胞和血液之间进行物质交换的场所",
+      "reason": "最大消化腺，代谢中枢"
+    },
+    {
+      "keyword": "肺",
+      "aliases": [
+        "lung"
+      ],
+      "category": "解剖结构",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肺",
+        "呼吸系统"
+      ],
+      "evidence_hint": "肺泡孔也是炎症迅速蔓延的渠道",
+      "reason": "呼吸系统核心器官"
+    },
+    {
+      "keyword": "肾",
+      "aliases": [
+        "kidney"
+      ],
+      "category": "解剖结构",
+      "body_system": "泌尿系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肾",
+        "泌尿系统"
+      ],
+      "evidence_hint": "肾实质由大量肾单位和集合管构成",
+      "reason": "尿液形成器官"
+    },
+    {
+      "keyword": "睾丸",
+      "aliases": [
+        "testis"
+      ],
+      "category": "解剖结构",
+      "body_system": "男性生殖系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "睾丸",
+        "男性生殖系统"
+      ],
+      "evidence_hint": "睾丸位于阴囊中",
+      "reason": "男性生殖腺"
+    },
+    {
+      "keyword": "卵巢",
+      "aliases": [
+        "ovary"
+      ],
+      "category": "解剖结构",
+      "body_system": "女性生殖系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "卵巢",
+        "女性生殖系统"
+      ],
+      "evidence_hint": "卵泡是由一个卵母细胞和周围的多个卵泡细胞组成",
+      "reason": "女性生殖腺"
+    },
+    {
+      "keyword": "受精",
+      "aliases": [
+        "fertilization"
+      ],
+      "category": "生理机制",
+      "body_system": "生殖系统",
+      "importance": "high",
+      "chapter_refs": [
+        "生殖细胞和受精",
+        "胚胎发生总论"
+      ],
+      "evidence_hint": "受精指精子与卵子结合形成受精卵的过程",
+      "reason": "个体发生的起点"
+    },
+    {
+      "keyword": "胚泡",
+      "aliases": [
+        "blastocyst"
+      ],
+      "category": "病理过程",
+      "body_system": "生殖系统",
+      "importance": "high",
+      "chapter_refs": [
+        "胚泡的形成和植入",
+        "胚胎发生总论"
+      ],
+      "evidence_hint": "卵裂和胚泡的形成",
+      "reason": "胚胎植入前结构"
+    },
+    {
+      "keyword": "胎盘",
+      "aliases": [
+        "placenta"
+      ],
+      "category": "解剖结构",
+      "body_system": "生殖系统",
+      "importance": "high",
+      "chapter_refs": [
+        "胎膜和胎盘",
+        "胚胎各期外形特征"
+      ],
+      "evidence_hint": "脐带是连于胚胎脐部与胎盘间的索状结构",
+      "reason": "母胎物质交换器官"
+    },
+    {
+      "keyword": "先天畸形",
+      "aliases": [
+        "congenital malformation",
+        "birth defect"
+      ],
+      "category": "病理过程",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "先天畸形概论",
+        "先天畸形的分类",
+        "先天畸形的发生原因"
+      ],
+      "evidence_hint": "研究出生缺陷的科学称为畸形学",
+      "reason": "胚胎学临床应用重点"
+    },
+    {
+      "keyword": "免疫系统",
+      "aliases": [
+        "immune system"
+      ],
+      "category": "教学章节",
+      "body_system": "免疫系统",
+      "importance": "high",
+      "chapter_refs": [
+        "免疫系统",
+        "主要的免疫细胞",
+        "淋巴器官"
+      ],
+      "evidence_hint": "免疫系统由淋巴器官、淋巴组织、免疫细胞和免疫活性分子构成",
+      "reason": "机体防御体系"
+    },
+    {
+      "keyword": "血液",
+      "aliases": [
+        "blood"
+      ],
+      "category": "教学章节",
+      "body_system": "血液系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "血液",
+        "红细胞",
+        "白细胞"
+      ],
+      "evidence_hint": "血液和淋巴分别是流动于心血管和淋巴管内的液态组织",
+      "reason": "结缔组织特例，重要诊断指标"
+    },
+    {
+      "keyword": "胚胎学",
+      "aliases": [
+        "embryology"
+      ],
+      "category": "教学章节",
+      "body_system": "生殖系统",
+      "importance": "high",
+      "chapter_refs": [
+        "胚胎学绪论",
+        "胚胎学的内容",
+        "学习胚胎学的意义"
+      ],
+      "evidence_hint": "胚胎学是研究从受精卵发育为新生个体的过程及其机制的科学",
+      "reason": "本教材两大组成部分之一"
+    }
+  ],
+  "themes": [
+    "基本组织",
+    "器官系统发生",
+    "临床联系与畸形",
+    "组织学技术"
+  ]
+}

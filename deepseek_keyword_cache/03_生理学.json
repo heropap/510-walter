@@ -1,0 +1,422 @@
+{
+  "textbook_id": "03_生理学",
+  "textbook_title": "生理学",
+  "keywords": [
+    {
+      "keyword": "稳态",
+      "aliases": [
+        "homeostasis"
+      ],
+      "category": "基础概念",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "绪论"
+      ],
+      "evidence_hint": "一切调节几乎都是围绕着保持这种稳态来进行的",
+      "reason": "生理学核心概念，贯穿全书"
+    },
+    {
+      "keyword": "内环境",
+      "aliases": [
+        "internal environment"
+      ],
+      "category": "生理机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "机体的内环境、稳态和生物节律"
+      ],
+      "evidence_hint": "内各种组织细胞直接接触并赖以生存的环境称为内环境",
+      "reason": "机体生存的直接环境，稳态调节对象"
+    },
+    {
+      "keyword": "负反馈",
+      "aliases": [
+        "negative feedback"
+      ],
+      "category": "生理机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "人体内自动控制系统"
+      ],
+      "evidence_hint": "负反馈控制系统是一个闭环的控制系统",
+      "reason": "维持稳态的主要调节方式"
+    },
+    {
+      "keyword": "细胞膜",
+      "aliases": [
+        "cell membrane",
+        "plasma membrane"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞膜的物质转运功能"
+      ],
+      "evidence_hint": "各种膜脂质在膜上的分布是不对称的",
+      "reason": "物质转运和信号转导的基础"
+    },
+    {
+      "keyword": "信号转导",
+      "aliases": [
+        "signal transduction"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞的信号转导"
+      ],
+      "evidence_hint": "细胞的信号转导本质上就是细胞和分子水平的功能调节",
+      "reason": "细胞间通讯与功能调控的核心过程"
+    },
+    {
+      "keyword": "静息电位",
+      "aliases": [
+        "resting potential"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞的电活动"
+      ],
+      "evidence_hint": "由 -70mV 变为 -90mV，表示膜的极化状态增强，这种过程或状态称为超极化",
+      "reason": "细胞电活动的基础状态"
+    },
+    {
+      "keyword": "动作电位",
+      "aliases": [
+        "action potential"
+      ],
+      "category": "细胞分子",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "细胞的电活动"
+      ],
+      "evidence_hint": "作电位的特点是持续时间长，形态复杂",
+      "reason": "可兴奋细胞兴奋的标志"
+    },
+    {
+      "keyword": "横纹肌",
+      "aliases": [
+        "striated muscle"
+      ],
+      "category": "解剖结构",
+      "body_system": "肌肉系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肌细胞的收缩"
+      ],
+      "evidence_hint": "肌在光学显微镜下显现明暗交替的横纹，故统称为横纹肌",
+      "reason": "骨骼肌和心肌的共性结构"
+    },
+    {
+      "keyword": "血液",
+      "aliases": [
+        "blood"
+      ],
+      "category": "解剖结构",
+      "body_system": "循环系统",
+      "importance": "high",
+      "chapter_refs": [
+        "血液",
+        "血液生理概述"
+      ],
+      "evidence_hint": "血液是一种在心血管系统里不断循环流动的流体组织",
+      "reason": "运输和维持内环境稳态的介质"
+    },
+    {
+      "keyword": "红细胞",
+      "aliases": [
+        "red blood cell",
+        "erythrocyte"
+      ],
+      "category": "解剖结构",
+      "body_system": "循环系统",
+      "importance": "high",
+      "chapter_refs": [
+        "血细胞生理"
+      ],
+      "evidence_hint": "红细胞是血液中数量最多的血细胞",
+      "reason": "氧气运输的主要载体"
+    },
+    {
+      "keyword": "血红蛋白",
+      "aliases": [
+        "hemoglobin",
+        "Hb"
+      ],
+      "category": "细胞分子",
+      "body_system": "循环系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "血细胞生理"
+      ],
+      "evidence_hint": "红细胞内的蛋白质主要是血红蛋白",
+      "reason": "红细胞功能蛋白，参与气体运输"
+    },
+    {
+      "keyword": "凝血因子",
+      "aliases": [
+        "clotting factor",
+        "coagulation factor"
+      ],
+      "category": "细胞分子",
+      "body_system": "循环系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "生理性止血"
+      ],
+      "evidence_hint": "凝血因子Ⅰ～ⅩⅢ，其中FⅥ是血清中活化的FⅤa",
+      "reason": "生理性止血的关键成分"
+    },
+    {
+      "keyword": "血型",
+      "aliases": [
+        "blood type",
+        "blood group"
+      ],
+      "category": "基础概念",
+      "body_system": "循环系统",
+      "importance": "low",
+      "chapter_refs": [
+        "血型和输血原则"
+      ],
+      "evidence_hint": "红细胞凝集的本质是抗原-抗体反应",
+      "reason": "输血和器官移植的基础"
+    },
+    {
+      "keyword": "心动周期",
+      "aliases": [
+        "cardiac cycle"
+      ],
+      "category": "生理机制",
+      "body_system": "循环系统",
+      "importance": "high",
+      "chapter_refs": [
+        "心脏的泵血功能"
+      ],
+      "evidence_hint": "动中起主要作用，故心动周期通常是指心室的活动周期",
+      "reason": "心脏泵血活动的时间序列"
+    },
+    {
+      "keyword": "血压",
+      "aliases": [
+        "blood pressure"
+      ],
+      "category": "生理机制",
+      "body_system": "循环系统",
+      "importance": "high",
+      "chapter_refs": [
+        "血管生理"
+      ],
+      "evidence_hint": "流量是相等的，但压力和容量的差别较大",
+      "reason": "心血管功能的重要指标"
+    },
+    {
+      "keyword": "肺通气",
+      "aliases": [
+        "pulmonary ventilation"
+      ],
+      "category": "生理机制",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肺通气"
+      ],
+      "evidence_hint": "肺通气是气体在外界大气和肺泡之间的交换过程",
+      "reason": "呼吸过程的起始环节"
+    },
+    {
+      "keyword": "气体交换",
+      "aliases": [
+        "gas exchange"
+      ],
+      "category": "生理机制",
+      "body_system": "呼吸系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肺换气和组织换气"
+      ],
+      "evidence_hint": "这一过程处发生净转移，这一过程称为气体的扩散",
+      "reason": "氧气摄入和二氧化碳排出的关键"
+    },
+    {
+      "keyword": "胃液",
+      "aliases": [
+        "gastric juice"
+      ],
+      "category": "生理机制",
+      "body_system": "消化系统",
+      "importance": "low",
+      "chapter_refs": [
+        "胃内消化"
+      ],
+      "evidence_hint": "胃对食物的化学性消化是通过胃黏膜中多种外分泌腺细胞分泌的胃液来实现的",
+      "reason": "胃内化学消化的介质"
+    },
+    {
+      "keyword": "胰腺",
+      "aliases": [
+        "pancreas"
+      ],
+      "category": "解剖结构",
+      "body_system": "消化系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "小肠内消化"
+      ],
+      "evidence_hint": "胰腺是兼有外分泌和内分泌功能的腺体",
+      "reason": "消化酶和激素的重要来源"
+    },
+    {
+      "keyword": "肝脏",
+      "aliases": [
+        "liver"
+      ],
+      "category": "解剖结构",
+      "body_system": "消化系统",
+      "importance": "medium",
+      "chapter_refs": [
+        "肝脏的消化功能和其他生理作用"
+      ],
+      "evidence_hint": "肝脏是人体内最大的消化腺，也是体内新陈代谢的中心站",
+      "reason": "物质代谢和解毒的核心器官"
+    },
+    {
+      "keyword": "能量代谢",
+      "aliases": [
+        "energy metabolism"
+      ],
+      "category": "生理机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "能量代谢"
+      ],
+      "evidence_hint": "储存和利用称为能量代谢",
+      "reason": "机体功能活动的能量基础"
+    },
+    {
+      "keyword": "体温调节",
+      "aliases": [
+        "thermoregulation"
+      ],
+      "category": "生理机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "体温及其调节"
+      ],
+      "evidence_hint": "这既是维持机体正常生命活动的重要保障",
+      "reason": "维持内环境稳态的重要方面"
+    },
+    {
+      "keyword": "肾小球滤过率",
+      "aliases": [
+        "GFR",
+        "glomerular filtration rate"
+      ],
+      "category": "生理机制",
+      "body_system": "泌尿系统",
+      "importance": "high",
+      "chapter_refs": [
+        "肾小球的滤过功能"
+      ],
+      "evidence_hint": "单位时间内两肾生成的超滤液量称为肾小球滤过率",
+      "reason": "评价肾功能的关键指标"
+    },
+    {
+      "keyword": "抗利尿激素",
+      "aliases": [
+        "ADH",
+        "vasopressin"
+      ],
+      "category": "生理机制",
+      "body_system": "全身/通用",
+      "importance": "high",
+      "chapter_refs": [
+        "尿生成的调节"
+      ],
+      "evidence_hint": "抗利尿激素的释放受多重因素的调节和影响，其中最重要的是血浆晶体渗透压和循环血量",
+      "reason": "调节尿量和渗透压的关键激素"
+    },
+    {
+      "keyword": "感受器",
+      "aliases": [
+        "sensory receptor",
+        "receptor"
+      ],
+      "category": "解剖结构",
+      "body_system": "神经系统",
+      "importance": "high",
+      "chapter_refs": [
+        "感觉概述"
+      ],
+      "evidence_hint": "最简单的感受器是游离神经末梢",
+      "reason": "感觉传入的起始点"
+    },
+    {
+      "keyword": "视觉",
+      "aliases": [
+        "vision"
+      ],
+      "category": "生理机制",
+      "body_system": "神经系统",
+      "importance": "high",
+      "chapter_refs": [
+        "视觉"
+      ],
+      "evidence_hint": "人眼的适宜刺激是波长为380～760nm的电磁波",
+      "reason": "最重要的感觉功能之一"
+    },
+    {
+      "keyword": "突触",
+      "aliases": [
+        "synapse"
+      ],
+      "category": "解剖结构",
+      "body_system": "神经系统",
+      "importance": "high",
+      "chapter_refs": [
+        "神经系统功能活动的基本原理"
+      ],
+      "evidence_hint": "在大脑皮层，约98%的突触由树突参与形成",
+      "reason": "神经元间信息传递的基本结构"
+    },
+    {
+      "keyword": "激素",
+      "aliases": [
+        "hormone"
+      ],
+      "category": "细胞分子",
+      "body_system": "内分泌系统",
+      "importance": "high",
+      "chapter_refs": [
+        "内分泌",
+        "内分泌与激素"
+      ],
+      "evidence_hint": "人体腺上皮组织的基本功能是分泌，可分为外分泌和内分泌两种方式",
+      "reason": "体液调节的主要信使"
+    },
+    {
+      "keyword": "下丘脑-垂体轴",
+      "aliases": [
+        "hypothalamic-pituitary axis"
+      ],
+      "category": "解剖结构",
+      "body_system": "内分泌系统",
+      "importance": "high",
+      "chapter_refs": [
+        "下丘脑-垂体及松果体内分泌"
+      ],
+      "evidence_hint": "垂体门脉系统是一个独特的神经-血液的接触面",
+      "reason": "神经-内分泌调控的核心枢纽"
+    }
+  ]
+}
