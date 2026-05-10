@@ -5,7 +5,7 @@
 1. Confirm `python app.py` opens on `http://localhost:7860`.
 2. Confirm the Dockerfile starts `app.py` and exposes `7860`.
 3. Confirm GitHub and ModelScope remotes are available.
-4. Prepare one API key path: `DASHSCOPE_API_KEY` or `OPENAI_API_KEY`.
+4. Prepare one API key path: `OPENAI_API_KEY` for DeepSeek V4 Pro.
 
 ## 0:00-0:30 Scope
 

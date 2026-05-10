@@ -1,58 +1,86 @@
-# 510 Walter
+# 学科知识整合智能体
 
-ModelScope-ready Gradio starter for a 5-hour solo AI hackathon.
+FastAPI + React/Vite + D3 的全栈教材整合应用，用 7 本医学教材生成可交互知识图谱、整合决策、RAG 问答和学习材料样例。
 
-## Local Run
-
-Use Python 3.10+.
+## 本地运行
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
+cd frontend
+npm install
+npm run build
+cd ..
+
 cp .env.example .env
 python app.py
 ```
 
-Open `http://localhost:7860`.
-
-## Model Config
-
-The app runs even without a model key, using a local demo fallback so the page is always presentable.
-
-For DashScope / Qwen compatible mode:
+打开 `http://localhost:7860`。开发前端时可另开：
 
 ```bash
-DASHSCOPE_API_KEY=your_key
-OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-MODEL_NAME=qwen-plus
+cd frontend
+npm run dev
 ```
 
-For any OpenAI-compatible provider:
+如果部署在子路径，例如 `https://your-domain.com/510-walter`：
 
 ```bash
-OPENAI_API_KEY=your_key
-OPENAI_BASE_URL=https://your-provider.example/v1
-MODEL_NAME=your-model
+APP_BASE_PATH=/510-walter npm --prefix frontend run build
+APP_BASE_PATH=/510-walter python app.py
 ```
 
-## ModelScope Deploy
-
-The deployment entry is `app.py`, and the container listens on port `7860`.
+Docker 构建同理：
 
 ```bash
-git lfs install
-git add app.py Dockerfile requirements.txt README.md TASK_BRIEF.md .env.example .gitignore docs/
-git commit -m "Prepare ModelScope hackathon starter"
-git push
+docker build --build-arg APP_BASE_PATH=/510-walter -t 510-walter .
+docker run -d --name 510-walter --env-file .env -p 7860:7860 510-walter
 ```
 
-Use the ModelScope Studio Git URL from the ModelScope console when pushing to the deployment space.
+## 环境变量
 
-## Competition Day Flow
+`.env` 不会提交。DeepSeek 真实链路需要：
 
-1. Paste the directed challenge into `TASK_BRIEF.md`.
-2. Put the same challenge into the app's "命题" field.
-3. Build one complete demo path before adding optional features.
-4. Keep all outputs, screenshots, and demo scripts under `outputs/` locally.
-5. Freeze features in the final 30 minutes and focus on deployment plus demo.
+```bash
+OPENAI_API_KEY=your_deepseek_key
+OPENAI_BASE_URL=https://api.deepseek.com
+MODEL_NAME=deepseek-v4-flash
+```
+
+Dify RAG 稍后补充：
+
+```bash
+DIFY_BASE_URL=https://your-dify-instance/v1
+DIFY_API_KEY=app-xxxxx
+DIFY_KNOWLEDGE_API_KEY=dataset-xxxxx
+DIFY_DATASET_ID=dataset-id
+```
+
+缺少 Dify 时，页面仍可运行，RAG Tab 会显示等待配置并使用本地 chunk 检索提示。
+
+PDF/DOCX 上传转换会优先使用 Python `markitdown` 包；如果包不存在，会调用 `MARKITDOWN_BIN`，默认可指向 `/Users/walter/.local/bin/markitdown`。
+
+## API
+
+- `GET /health`
+- `GET /api/config/status`
+- `GET /api/textbooks`
+- `GET /api/knowledge/graph/merged`
+- `POST /api/integrate/start`
+- `POST /api/rag/index`
+- `POST /api/rag/query`
+- `POST /api/chat/message`
+- `GET /api/game/skill-tree`
+- `GET /api/report/generate`
+
+## 验证
+
+```bash
+pytest
+npm --prefix frontend run build
+python app.py
+```
+
+启动后访问 `/health` 应返回 `ok: true`，主页应显示 7 本内置教材和整合图谱。
