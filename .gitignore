@@ -11,6 +11,8 @@ venv/
 env/
 outputs/
 data/
+data/textbooks/*.pdf
+*.pdf
 node_modules/
 dist/
 frontend/node_modules/

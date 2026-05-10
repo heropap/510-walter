@@ -136,6 +136,13 @@ def init_db(database_path: Path | None = None) -> None:
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS decision_overrides (
+                id TEXT PRIMARY KEY,
+                status TEXT,
+                reason TEXT,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS rag_chunks (
                 id TEXT PRIMARY KEY,
                 textbook_id TEXT NOT NULL,
@@ -156,4 +163,3 @@ def init_db(database_path: Path | None = None) -> None:
             );
             """
         )
-

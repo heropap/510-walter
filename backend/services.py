@@ -572,10 +572,70 @@ def get_graph(textbook_id: str, limit: int = 900) -> dict[str, Any]:
     )
 
 
+def decision_overrides(conn: Any) -> dict[str, dict[str, str | None]]:
+    rows = conn.execute("SELECT id,status,reason FROM decision_overrides").fetchall()
+    return {row["id"]: {"status": row["status"], "reason": row["reason"]} for row in rows}
+
+
+def apply_decision_override(
+    overrides: dict[str, dict[str, str | None]],
+    decision_id: str,
+    default_status: str,
+    default_reason: str,
+) -> tuple[str, str]:
+    override = overrides.get(decision_id, {})
+    status = override.get("status") or default_status
+    reason = override.get("reason") or default_reason
+    return status, reason
+
+
+def insert_merged_node(
+    conn: Any,
+    merged_id: str,
+    base: Any,
+    source_books: list[str],
+    frequency: int,
+    method: str,
+    confidence: float,
+    metadata: dict[str, Any],
+) -> None:
+    conn.execute(
+        """
+        INSERT INTO nodes (
+          id,textbook_id,name,definition,category,body_system,organ,anatomical_region,
+          scale_level,stage,importance,frequency,evidence,chapter_id,chapter_title,
+          source_textbooks,method,confidence,metadata
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """,
+        (
+            merged_id,
+            None,
+            base["name"],
+            base["definition"],
+            base["category"],
+            base["body_system"],
+            base["organ"],
+            base["anatomical_region"],
+            base["scale_level"],
+            base["stage"],
+            "high" if frequency > 1 or base["importance"] == "high" else base["importance"],
+            frequency,
+            base["evidence"],
+            base["chapter_id"],
+            base["chapter_title"],
+            as_json(source_books),
+            method,
+            confidence,
+            as_json(metadata),
+        ),
+    )
+
+
 def ensure_merged_graph() -> dict[str, Any]:
     with db() as conn:
         raw_nodes = conn.execute("SELECT * FROM nodes WHERE textbook_id IS NOT NULL").fetchall()
         raw_edges = conn.execute("SELECT * FROM edges WHERE textbook_id IS NOT NULL").fetchall()
+        overrides = decision_overrides(conn)
         conn.execute("DELETE FROM nodes WHERE textbook_id IS NULL")
         conn.execute("DELETE FROM edges WHERE textbook_id IS NULL")
         conn.execute("DELETE FROM integration_decisions")
@@ -589,7 +649,8 @@ def ensure_merged_graph() -> dict[str, Any]:
 
         node_map: dict[str, str] = {}
         merged_nodes: list[str] = []
-        total_chars = sum(len(node["definition"] or "") + len(node["evidence"] or "") for node in raw_nodes)
+        source_chars = conn.execute("SELECT COALESCE(SUM(total_chars),0) FROM textbooks").fetchone()[0]
+        total_chars = source_chars or sum(len(node["definition"] or "") + len(node["evidence"] or "") for node in raw_nodes)
         merged_chars = 0
 
         for normalized, nodes in groups.items():
@@ -598,60 +659,100 @@ def ensure_merged_graph() -> dict[str, Any]:
             merged_id = stable_id("merged", normalized, prefix="merged_")
             source_books = sorted({book for row in nodes for book in from_json(row["source_textbooks"], [])})
             frequency = len(nodes)
-            definition = base["definition"]
-            evidence = base["evidence"]
-            merged_chars += len(definition or "") + len(evidence or "")
-            conn.execute(
-                """
-                INSERT INTO nodes (
-                  id,textbook_id,name,definition,category,body_system,organ,anatomical_region,
-                  scale_level,stage,importance,frequency,evidence,chapter_id,chapter_title,
-                  source_textbooks,method,confidence,metadata
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-                """,
-                (
-                    merged_id,
-                    None,
-                    base["name"],
-                    definition,
-                    base["category"],
-                    base["body_system"],
-                    base["organ"],
-                    base["anatomical_region"],
-                    base["scale_level"],
-                    base["stage"],
-                    "high" if frequency > 1 or base["importance"] == "high" else base["importance"],
-                    frequency,
-                    evidence,
-                    base["chapter_id"],
-                    base["chapter_title"],
-                    as_json(source_books),
-                    "merged_semantic_rule",
-                    min(0.96, 0.72 + frequency * 0.05),
-                    as_json({"normalized_name": normalized, "source_node_ids": [row["id"] for row in nodes]}),
-                ),
-            )
-            merged_nodes.append(merged_id)
-            for row in nodes:
-                node_map[row["id"]] = merged_id
+            source_count = len(source_books) or frequency
+            if frequency > 1 and source_count <= 1:
+                for row in nodes_sorted:
+                    preserved_id = stable_id("preserved", row["id"], prefix="merged_")
+                    row_books = from_json(row["source_textbooks"], []) or [row["textbook_id"]]
+                    insert_merged_node(
+                        conn,
+                        preserved_id,
+                        row,
+                        row_books,
+                        1,
+                        "same_textbook_duplicate_preserved",
+                        row["confidence"],
+                        {"normalized_name": normalized, "source_node_ids": [row["id"]]},
+                    )
+                    merged_chars += len(row["definition"] or "") + len(row["evidence"] or "")
+                    merged_nodes.append(preserved_id)
+                    node_map[row["id"]] = preserved_id
+                continue
             if frequency > 1:
+                decision_id = stable_id("merge", normalized, prefix="decision_")
                 saved = sum(len(row["definition"] or "") + len(row["evidence"] or "") for row in nodes[1:])
+                default_reason = f"{frequency} 个来源节点（覆盖 {source_count} 本教材）出现“{base['name']}”或近似标题，保留证据更完整的版本并合并来源。"
+                status, reason = apply_decision_override(overrides, decision_id, "active", default_reason)
+                if status == "rejected":
+                    saved = 0
+                    for row in nodes_sorted:
+                        preserved_id = stable_id("preserved", row["id"], prefix="merged_")
+                        row_books = from_json(row["source_textbooks"], []) or [row["textbook_id"]]
+                        insert_merged_node(
+                            conn,
+                            preserved_id,
+                            row,
+                            row_books,
+                            1,
+                            "teacher_rejected_merge",
+                            row["confidence"],
+                            {
+                                "normalized_name": normalized,
+                                "source_node_ids": [row["id"]],
+                                "rejected_decision_id": decision_id,
+                            },
+                        )
+                        merged_chars += len(row["definition"] or "") + len(row["evidence"] or "")
+                        merged_nodes.append(preserved_id)
+                        node_map[row["id"]] = preserved_id
+                    result_node = None
+                else:
+                    insert_merged_node(
+                        conn,
+                        merged_id,
+                        base,
+                        source_books,
+                        frequency,
+                        "merged_semantic_rule",
+                        min(0.96, 0.72 + frequency * 0.05),
+                        {"normalized_name": normalized, "source_node_ids": [row["id"] for row in nodes]},
+                    )
+                    merged_chars += len(base["definition"] or "") + len(base["evidence"] or "")
+                    merged_nodes.append(merged_id)
+                    for row in nodes:
+                        node_map[row["id"]] = merged_id
+                    result_node = merged_id
                 conn.execute(
                     """
                     INSERT INTO integration_decisions (id,action,affected_nodes,result_node,reason,confidence,char_saved,status)
                     VALUES (?,?,?,?,?,?,?,?)
                     """,
                     (
-                        stable_id("merge", normalized, prefix="decision_"),
+                        decision_id,
                         "merge",
                         as_json([row["id"] for row in nodes]),
-                        merged_id,
-                        f"{frequency} 本教材出现“{base['name']}”或近似标题，保留证据更完整的版本并合并来源。",
+                        result_node,
+                        reason,
                         min(0.95, 0.72 + frequency * 0.04),
                         saved,
-                        "active",
+                        status,
                     ),
                 )
+            else:
+                insert_merged_node(
+                    conn,
+                    merged_id,
+                    base,
+                    source_books,
+                    frequency,
+                    "merged_semantic_rule",
+                    min(0.96, 0.72 + frequency * 0.05),
+                    {"normalized_name": normalized, "source_node_ids": [row["id"] for row in nodes]},
+                )
+                merged_chars += len(base["definition"] or "") + len(base["evidence"] or "")
+                merged_nodes.append(merged_id)
+                for row in nodes:
+                    node_map[row["id"]] = merged_id
 
         edge_seen: set[tuple[str, str, str]] = set()
         for edge in raw_edges:
@@ -684,20 +785,23 @@ def ensure_merged_graph() -> dict[str, Any]:
             )
         ratio = (merged_chars / total_chars) if total_chars else 0
         if ratio > 0.3:
+            decision_id = stable_id("compress", "target", prefix="decision_")
+            default_reason = f"当前规则整合后摘要字符比约 {ratio:.1%}，后续可通过 DeepSeek 重要性排序进一步压缩到 30%。"
+            status, reason = apply_decision_override(overrides, decision_id, "active", default_reason)
             conn.execute(
                 """
                 INSERT INTO integration_decisions (id,action,affected_nodes,result_node,reason,confidence,char_saved,status)
                 VALUES (?,?,?,?,?,?,?,?)
                 """,
                 (
-                    stable_id("compress", "target", prefix="decision_"),
+                    decision_id,
                     "compress",
                     as_json([]),
                     None,
-                    f"当前规则整合后摘要字符比约 {ratio:.1%}，后续可通过 DeepSeek 重要性排序进一步压缩到 30%。",
+                    reason,
                     0.7,
-                    max(total_chars - int(total_chars * 0.3), 0),
-                    "active",
+                    max(total_chars - int(total_chars * 0.3), 0) if status != "rejected" else 0,
+                    status,
                 ),
             )
     return get_merged_graph()
@@ -771,13 +875,44 @@ def update_decision(decision_id: str, payload: dict[str, Any]) -> dict[str, Any]
         if not row:
             raise HTTPException(status_code=404, detail="Decision not found")
         status = payload.get("status") or row["status"]
-        reason = payload.get("reason") or row["reason"]
+        reason = payload["reason"] if "reason" in payload and payload["reason"] is not None else row["reason"]
         conn.execute(
-            "UPDATE integration_decisions SET status = ?, reason = ? WHERE id = ?",
-            (status, reason, decision_id),
+            """
+            INSERT INTO decision_overrides (id,status,reason,updated_at)
+            VALUES (?,?,?,CURRENT_TIMESTAMP)
+            ON CONFLICT(id) DO UPDATE SET
+              status=excluded.status,
+              reason=excluded.reason,
+              updated_at=CURRENT_TIMESTAMP
+            """,
+            (decision_id, status, reason),
         )
+    ensure_merged_graph()
+    with db() as conn:
         updated = conn.execute("SELECT * FROM integration_decisions WHERE id = ?", (decision_id,)).fetchone()
-    return row_to_dict(updated)
+    result = row_to_dict(updated)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Decision no longer exists after refresh")
+    result["graph_stats"] = integration_stats()
+    return result
+
+
+def reject_merge_decision_from_message(message: str) -> dict[str, Any] | None:
+    decisions = [item for item in list_decisions() if item["action"] == "merge" and item["status"] == "active"]
+    if not decisions:
+        return None
+    cjk_terms = [term for term in re.findall(r"[\u4e00-\u9fff]{2,12}", message) if term not in {"不要合并", "不应该合并"}]
+    scored: list[tuple[int, dict[str, Any]]] = []
+    for decision in decisions:
+        reason = decision["reason"]
+        score = sum(1 for term in cjk_terms if term in reason)
+        scored.append((score, decision))
+    scored.sort(key=lambda item: (item[0], item[1]["confidence"]), reverse=True)
+    target = scored[0][1]
+    reason = target["reason"]
+    if "教师通过对话要求撤销" not in reason:
+        reason = f"{reason} 教师通过对话要求撤销该合并，系统已恢复对应来源节点。"
+    return update_decision(target["id"], {"status": "rejected", "reason": reason})
 
 
 class DeepSeekClient:
@@ -1139,7 +1274,11 @@ async def chat_message(session_id: str, message: str) -> dict[str, Any]:
         content = "当前主要合并理由：\n" + "\n".join(f"- {item['reason']}" for item in decisions) if decisions else "当前还没有合并决策。"
         result = {"answer": content, "citations": [], "conversation_id": session_id, "provider": "decision_intent"}
     elif any(word in normalized for word in ["分开", "不要合并", "不应该合并"]):
-        content = "已识别为撤销合并意图。当前版本会记录教师反馈；具体决策可在“整合”面板中标记为 rejected。"
+        updated = reject_merge_decision_from_message(normalized)
+        if updated:
+            content = f"已撤销一条合并决策并刷新整合图谱：{updated['reason']}"
+        else:
+            content = "已识别为撤销合并意图，但当前没有可撤销的 active 合并决策。"
         result = {"answer": content, "citations": [], "conversation_id": session_id, "provider": "decision_intent"}
     elif any(word in normalized for word in ["保留", "不要删", "恢复"]):
         content = "已识别为保留知识点意图。当前版本会记录反馈，并建议在整合决策列表中保留对应节点。"
@@ -1242,8 +1381,11 @@ def generate_report() -> str:
     stats = integration_stats()
     textbooks = list_textbooks()
     decisions = list_decisions()[:12]
+    status_labels = {"active": "已应用", "hidden": "已隐藏", "rejected": "已撤销"}
     lines = [
         "# 学科知识整合报告",
+        "",
+        "> 本报告由当前 7 本医学教材样例和运行时整合图谱生成，可作为评审交付物和课堂复核清单。",
         "",
         "## 数据概览",
         "",
@@ -1252,6 +1394,8 @@ def generate_report() -> str:
         f"- 整合摘要字符数：{stats['merged_chars']:,}",
         f"- 当前压缩比：{stats['compression_ratio']:.2%}",
         f"- 图谱节点：{stats['raw_node_count']} → {stats['merged_node_count']}",
+        f"- 整合决策：{stats['decision_count']} 条，累计节省字符约 {stats['char_saved']:,}",
+        f"- RAG 分块：{stats['rag_chunks']:,} 个",
         "",
         "## 教材清单",
         "",
@@ -1259,8 +1403,14 @@ def generate_report() -> str:
     for textbook in textbooks:
         lines.append(f"- 《{textbook['title']}》：{textbook['chapter_count']} 个章节节点")
     lines.extend(["", "## 主要整合决策", ""])
-    for decision in decisions:
-        lines.append(f"- {decision['action']}：{decision['reason']}（置信度 {decision['confidence']:.2f}）")
+    if decisions:
+        for decision in decisions:
+            status = status_labels.get(decision["status"], decision["status"])
+            lines.append(
+                f"- [{status}] {decision['action']}：{decision['reason']}（置信度 {decision['confidence']:.2f}，节省 {decision['char_saved']:,} 字符）"
+            )
+    else:
+        lines.append("- 当前暂无整合决策。")
     lines.extend(
         [
             "",
@@ -1269,11 +1419,21 @@ def generate_report() -> str:
             "- 先用医学导航按器官系统筛选，再进入图谱查看跨教材来源。",
             "- 对高频节点优先生成课堂讲解材料，低置信度合并项由教师复核。",
             "- RAG 问答必须展示教材和章节引用，避免脱离教材自由发挥。",
+            "",
+            "## 已知局限与复核项",
+            "",
+            "- PDF/DOCX 转 Markdown 依赖原文件版式质量；扫描版或复杂表格需要 OCR/人工校对兜底。",
+            "- 当前语义整合以章节标题、定义句和来源频次为主，医学同义词、缩写和跨层级关系仍需要教师复核。",
+            "- Dify 未配置时系统使用本地 chunk 检索降级，能展示引用片段，但不等同于完整混合检索生成链路。",
+            "- 30% 压缩目标按字符和节点规模估算，最终教学完整性需要结合课程大纲和课堂目标再次确认。",
+            "- NotebookLM 和闯关游戏属于可选创新层；核心 P0 不依赖这些第三方或样例输出。",
         ]
     )
     report = "\n".join(lines)
-    path = get_settings().output_dir / "整合报告.md"
-    path.write_text(report, encoding="utf-8")
+    settings = get_settings()
+    for path in [settings.output_dir / "整合报告.md", settings.root_dir / "report" / "整合报告.md"]:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(report, encoding="utf-8")
     return report
 
 

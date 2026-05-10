@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Activity, BookOpen, Brain, FileText, Gamepad2, GitMerge, Layers, MessageSquare, Minus, Network, Search, Send, UploadCloud } from "lucide-react";
+import { Activity, BookOpen, Brain, Check, Clock, EyeOff, FileText, Gamepad2, GitBranch, GitMerge, Layers, MapPin, MessageSquare, Minus, Network, Search, Send, Undo2, UploadCloud } from "lucide-react";
 import * as d3 from "d3";
 import { api } from "./api";
 import type { ConfigStatus, Decision, GraphEdge, GraphNode, KnowledgeGraph, RagCitation, Textbook } from "./types";
@@ -8,6 +8,10 @@ import "./styles.css";
 
 const TEXTBOOK_COLORS = ["#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", "#EDC948", "#B07AA1"];
 const BODY_SYSTEMS = ["全部", "呼吸系统", "循环系统", "消化系统", "神经系统", "免疫系统", "感染病", "全身/通用"];
+const STAGE_ORDER = ["正常结构", "正常功能", "感染传播", "病理形态", "病理生理", "临床应用"];
+const SCALE_ORDER = ["宏观解剖", "器官", "组织", "细胞", "分子", "病原体", "疾病/临床"];
+
+type ViewMode = "graph" | "location" | "timeline" | "hierarchy";
 
 type ImportState = {
   status: "idle" | "running" | "success" | "error";
@@ -395,7 +399,207 @@ function NodeDetail({ node }: { node: GraphNode | null }) {
   );
 }
 
-function IntegrationTab({ decisions, onRefresh }: { decisions: Decision[]; onRefresh: () => void }) {
+function groupNodes(nodes: GraphNode[], field: "body_system" | "stage" | "scale_level", order: string[]): Map<string, GraphNode[]> {
+  const groups = new Map<string, GraphNode[]>();
+  for (const key of order) groups.set(key, []);
+  groups.set("其他", []);
+  for (const node of nodes) {
+    const key = node[field] || "其他";
+    const bucket = groups.get(key) || groups.get("其他")!;
+    bucket.push(node);
+  }
+  for (const [key, items] of groups) {
+    if (items.length === 0) groups.delete(key);
+  }
+  return groups;
+}
+
+const BODY_SYSTEM_COLORS: Record<string, string> = {
+  "呼吸系统": "#4E79A7", "循环系统": "#E15759", "消化系统": "#F28E2B",
+  "神经系统": "#B07AA1", "免疫系统": "#59A14F", "感染病": "#EDC948", "全身/通用": "#76B7B2",
+};
+
+const STAGE_COLORS: Record<string, string> = {
+  "正常结构": "#059669", "正常功能": "#0d9488", "感染传播": "#d97706",
+  "病理形态": "#dc2626", "病理生理": "#be185d", "临床应用": "#7c3aed",
+};
+
+const SCALE_COLORS: Record<string, string> = {
+  "宏观解剖": "#1e40af", "器官": "#0369a1", "组织": "#0d9488",
+  "细胞": "#059669", "分子": "#d97706", "病原体": "#dc2626", "疾病/临床": "#7c3aed",
+};
+
+function LocationView({
+  graph,
+  query,
+  selected,
+  onSelect
+}: {
+  graph: KnowledgeGraph | null;
+  query: string;
+  selected: GraphNode | null;
+  onSelect: (node: GraphNode) => void;
+}) {
+  const [expandedSystem, setExpandedSystem] = React.useState<string | null>(null);
+  if (!graph) return null;
+  const lowerQuery = query.trim().toLowerCase();
+  const filtered = graph.nodes.filter(
+    (n) => !lowerQuery || n.name.toLowerCase().includes(lowerQuery) || n.definition.toLowerCase().includes(lowerQuery)
+  );
+  const groups = groupNodes(filtered, "body_system", BODY_SYSTEMS.slice(1));
+
+  return (
+    <div className="nav-view location-view">
+      {Array.from(groups.entries()).map(([system, nodes]) => {
+        const isOpen = expandedSystem === system;
+        return (
+          <div key={system} className="nav-group">
+            <button
+              className={`nav-group-header ${isOpen ? "open" : ""}`}
+              onClick={() => setExpandedSystem(isOpen ? null : system)}
+              style={{ borderLeftColor: BODY_SYSTEM_COLORS[system] || "#94a3b8" }}
+            >
+              <span className="nav-group-label">{system}</span>
+              <span className="nav-group-count">{nodes.length}</span>
+            </button>
+            {isOpen && (
+              <div className="nav-group-body">
+                {nodes.slice(0, 60).map((node) => (
+                  <button
+                    key={node.id}
+                    className={`nav-node-chip ${selected?.id === node.id ? "active" : ""}`}
+                    onClick={() => onSelect(node)}
+                  >
+                    <span className="nav-node-name">{node.name}</span>
+                    {node.source_textbooks?.length > 1 && <span className="nav-node-badge">x{node.source_textbooks.length}</span>}
+                  </button>
+                ))}
+                {nodes.length > 60 && <span className="nav-overflow">+{nodes.length - 60} 更多</span>}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TimelineView({
+  graph,
+  query,
+  bodySystem,
+  selected,
+  onSelect
+}: {
+  graph: KnowledgeGraph | null;
+  query: string;
+  bodySystem: string;
+  selected: GraphNode | null;
+  onSelect: (node: GraphNode) => void;
+}) {
+  if (!graph) return null;
+  const lowerQuery = query.trim().toLowerCase();
+  const filtered = graph.nodes
+    .filter((n) => bodySystem === "全部" || n.body_system === bodySystem)
+    .filter((n) => !lowerQuery || n.name.toLowerCase().includes(lowerQuery) || n.definition.toLowerCase().includes(lowerQuery));
+  const groups = groupNodes(filtered, "stage", STAGE_ORDER);
+
+  return (
+    <div className="nav-view timeline-view">
+      <div className="timeline-track" />
+      {Array.from(groups.entries()).map(([stage, nodes]) => (
+        <div key={stage} className="timeline-lane">
+          <div className="timeline-stage" style={{ borderColor: STAGE_COLORS[stage] || "#94a3b8" }}>
+            <span className="timeline-dot" style={{ background: STAGE_COLORS[stage] || "#94a3b8" }} />
+            <span>{stage}</span>
+            <span className="nav-group-count">{nodes.length}</span>
+          </div>
+          <div className="nav-group-body">
+            {nodes.slice(0, 40).map((node) => (
+              <button
+                key={node.id}
+                className={`nav-node-chip ${selected?.id === node.id ? "active" : ""}`}
+                onClick={() => onSelect(node)}
+              >
+                <span className="nav-node-name">{node.name}</span>
+                <span className="nav-node-sub">{node.body_system}</span>
+              </button>
+            ))}
+            {nodes.length > 40 && <span className="nav-overflow">+{nodes.length - 40} 更多</span>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HierarchyView({
+  graph,
+  query,
+  bodySystem,
+  selected,
+  onSelect
+}: {
+  graph: KnowledgeGraph | null;
+  query: string;
+  bodySystem: string;
+  selected: GraphNode | null;
+  onSelect: (node: GraphNode) => void;
+}) {
+  if (!graph) return null;
+  const lowerQuery = query.trim().toLowerCase();
+  const filtered = graph.nodes
+    .filter((n) => bodySystem === "全部" || n.body_system === bodySystem)
+    .filter((n) => !lowerQuery || n.name.toLowerCase().includes(lowerQuery) || n.definition.toLowerCase().includes(lowerQuery));
+  const groups = groupNodes(filtered, "scale_level", SCALE_ORDER);
+
+  return (
+    <div className="nav-view hierarchy-view">
+      {Array.from(groups.entries()).map(([level, nodes], idx) => (
+        <div key={level} className="hierarchy-tier">
+          <div className="hierarchy-label" style={{ borderLeftColor: SCALE_COLORS[level] || "#94a3b8" }}>
+            <span className="hierarchy-depth">{idx + 1}</span>
+            <span>{level}</span>
+            <span className="nav-group-count">{nodes.length}</span>
+          </div>
+          <div className="nav-group-body">
+            {nodes.slice(0, 40).map((node) => (
+              <button
+                key={node.id}
+                className={`nav-node-chip ${selected?.id === node.id ? "active" : ""}`}
+                onClick={() => onSelect(node)}
+              >
+                <span className="nav-node-name">{node.name}</span>
+                <span className="nav-node-sub">{node.body_system}</span>
+              </button>
+            ))}
+            {nodes.length > 40 && <span className="nav-overflow">+{nodes.length - 40} 更多</span>}
+          </div>
+          {idx < groups.size - 1 && <div className="hierarchy-connector" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function IntegrationTab({
+  decisions,
+  onRefresh,
+  onDecisionUpdate
+}: {
+  decisions: Decision[];
+  onRefresh: () => void;
+  onDecisionUpdate: (decisionId: string, status: "active" | "hidden" | "rejected") => Promise<void>;
+}) {
+  const [busyDecisionId, setBusyDecisionId] = React.useState<string | null>(null);
+  async function setDecisionStatus(decisionId: string, status: "active" | "hidden" | "rejected") {
+    setBusyDecisionId(decisionId);
+    try {
+      await onDecisionUpdate(decisionId, status);
+    } finally {
+      setBusyDecisionId(null);
+    }
+  }
   return (
     <div className="tab-content">
       <button className="primary-action" onClick={onRefresh}>
@@ -411,6 +615,32 @@ function IntegrationTab({ decisions, onRefresh }: { decisions: Decision[]; onRef
             </div>
             <p>{decision.reason}</p>
             <small>节省字符：{decision.char_saved.toLocaleString("zh-CN")} · {decision.status}</small>
+            <div className="decision-actions">
+              <button
+                type="button"
+                disabled={busyDecisionId === decision.id || decision.status === "active"}
+                onClick={() => void setDecisionStatus(decision.id, "active")}
+                title="应用这条整合决策"
+              >
+                <Check size={14} /> 应用
+              </button>
+              <button
+                type="button"
+                disabled={busyDecisionId === decision.id || decision.status === "hidden"}
+                onClick={() => void setDecisionStatus(decision.id, "hidden")}
+                title="保留图谱结果但不在报告中突出展示"
+              >
+                <EyeOff size={14} /> 隐藏
+              </button>
+              <button
+                type="button"
+                disabled={busyDecisionId === decision.id || decision.status === "rejected"}
+                onClick={() => void setDecisionStatus(decision.id, "rejected")}
+                title="撤销合并并恢复来源节点"
+              >
+                <Undo2 size={14} /> 撤销
+              </button>
+            </div>
           </article>
         ))}
       </div>
@@ -530,7 +760,17 @@ function GameTab() {
   );
 }
 
-function FunctionPanel({ config, decisions, onIntegrate }: { config: ConfigStatus | null; decisions: Decision[]; onIntegrate: () => void }) {
+function FunctionPanel({
+  config,
+  decisions,
+  onIntegrate,
+  onDecisionUpdate
+}: {
+  config: ConfigStatus | null;
+  decisions: Decision[];
+  onIntegrate: () => void;
+  onDecisionUpdate: (decisionId: string, status: "active" | "hidden" | "rejected") => Promise<void>;
+}) {
   const [tab, setTab] = React.useState("integrate");
   const tabs = [
     ["integrate", "整合", GitMerge],
@@ -548,7 +788,7 @@ function FunctionPanel({ config, decisions, onIntegrate }: { config: ConfigStatu
           </button>
         ))}
       </div>
-      {tab === "integrate" ? <IntegrationTab decisions={decisions} onRefresh={onIntegrate} /> : null}
+      {tab === "integrate" ? <IntegrationTab decisions={decisions} onRefresh={onIntegrate} onDecisionUpdate={onDecisionUpdate} /> : null}
       {tab === "rag" ? <RagTab difyReady={Boolean(config?.dify.chat_configured)} /> : null}
       {tab === "chat" ? <ChatTab /> : null}
       {tab === "materials" ? <LearningTab /> : null}
@@ -569,6 +809,7 @@ function App() {
   const [expandedGraphNodeIds, setExpandedGraphNodeIds] = React.useState<Set<string>>(() => new Set());
   const [stats, setStats] = React.useState<Record<string, number | boolean> | null>(null);
   const [decisions, setDecisions] = React.useState<Decision[]>([]);
+  const [viewMode, setViewMode] = React.useState<ViewMode>("graph");
   const [importState, setImportState] = React.useState<ImportState>({ status: "idle" });
   const [error, setError] = React.useState("");
 
@@ -654,6 +895,16 @@ function App() {
     setExpandedGraphNodeIds(new Set());
   }
 
+  async function updateDecision(decisionId: string, status: "active" | "hidden" | "rejected") {
+    await api.updateDecision(decisionId, { status });
+    await refresh();
+    const result = await api.mergedGraph();
+    setGraph(result);
+    setActiveId("merged");
+    setSelected(result.nodes[0] || null);
+    setExpandedGraphNodeIds(new Set());
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -675,43 +926,67 @@ function App() {
         <TextbookPanel textbooks={textbooks} activeId={activeId} onSelect={setActiveId} onUpload={upload} importState={importState} stats={stats} />
         <section className="center-panel">
           <div className="graph-toolbar">
+            <div className="view-tabs">
+              {([["graph", "图谱", Network], ["location", "位置", MapPin], ["timeline", "时间", Clock], ["hierarchy", "层级", GitBranch]] as const).map(([id, label, Icon]) => (
+                <button key={id} className={`view-tab ${viewMode === id ? "active" : ""}`} onClick={() => setViewMode(id as ViewMode)}>
+                  <Icon size={14} /> {label}
+                </button>
+              ))}
+            </div>
             <div className="search-box">
               <Search size={16} />
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索知识点名称或定义..." />
             </div>
-            <select value={bodySystem} onChange={(event) => setBodySystem(event.target.value)}>
-              {BODY_SYSTEMS.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-            <select
-              value={graphExpansionDepth}
-              onChange={(event) => setGraphExpansionDepth(Number(event.target.value) as GraphExpansionDepth)}
-              aria-label="展开深度"
-              title="展开深度"
-            >
-              <option value={1}>子级</option>
-              <option value={2}>孙级</option>
-            </select>
-            <button className="toolbar-icon-button" type="button" onClick={collapseGraphNodes} disabled={expandedGraphNodeIds.size === 0} aria-label="收起全部" title="收起全部">
-              <Minus size={16} />
-            </button>
+            {viewMode !== "location" && (
+              <select value={bodySystem} onChange={(event) => setBodySystem(event.target.value)}>
+                {BODY_SYSTEMS.map((item) => (
+                  <option key={item}>{item}</option>
+                ))}
+              </select>
+            )}
+            {viewMode === "graph" && (
+              <>
+                <select
+                  value={graphExpansionDepth}
+                  onChange={(event) => setGraphExpansionDepth(Number(event.target.value) as GraphExpansionDepth)}
+                  aria-label="展开深度"
+                  title="展开深度"
+                >
+                  <option value={1}>子级</option>
+                  <option value={2}>孙级</option>
+                </select>
+                <button className="toolbar-icon-button" type="button" onClick={collapseGraphNodes} disabled={expandedGraphNodeIds.size === 0} aria-label="收起全部" title="收起全部">
+                  <Minus size={16} />
+                </button>
+              </>
+            )}
           </div>
           <div className="graph-wrap">
-            <GraphCanvas
-              graph={graph}
-              query={query}
-              bodySystem={bodySystem}
-              expansionDepth={graphExpansionDepth}
-              expandedNodeIds={expandedGraphNodeIds}
-              selected={selected}
-              onSelect={setSelected}
-              onToggleNode={toggleGraphNode}
-            />
+            {viewMode === "graph" && (
+              <GraphCanvas
+                graph={graph}
+                query={query}
+                bodySystem={bodySystem}
+                expansionDepth={graphExpansionDepth}
+                expandedNodeIds={expandedGraphNodeIds}
+                selected={selected}
+                onSelect={setSelected}
+                onToggleNode={toggleGraphNode}
+              />
+            )}
+            {viewMode === "location" && (
+              <LocationView graph={graph} query={query} selected={selected} onSelect={setSelected} />
+            )}
+            {viewMode === "timeline" && (
+              <TimelineView graph={graph} query={query} bodySystem={bodySystem} selected={selected} onSelect={setSelected} />
+            )}
+            {viewMode === "hierarchy" && (
+              <HierarchyView graph={graph} query={query} bodySystem={bodySystem} selected={selected} onSelect={setSelected} />
+            )}
           </div>
           <NodeDetail node={selected} />
         </section>
-        <FunctionPanel config={config} decisions={decisions} onIntegrate={integrate} />
+        <FunctionPanel config={config} decisions={decisions} onIntegrate={integrate} onDecisionUpdate={updateDecision} />
       </main>
       <footer className="statusbar">
         <span>节点：{graph?.nodes.length || 0}</span>

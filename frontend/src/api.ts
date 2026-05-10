@@ -43,6 +43,11 @@ export const api = {
   integrate: () => request<Record<string, unknown>>("/api/integrate/start", { method: "POST" }),
   stats: () => request<Record<string, number | boolean>>("/api/integrate/stats"),
   decisions: () => request<Decision[]>("/api/integrate/decisions"),
+  updateDecision: (id: string, payload: { status?: "active" | "hidden" | "rejected"; reason?: string }) =>
+    request<Decision>(`/api/integrate/decisions/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    }),
   ragIndex: () => request<Record<string, unknown>>("/api/rag/index", { method: "POST" }),
   ragStatus: () => request<Record<string, unknown>>("/api/rag/status"),
   ragQuery: (question: string) =>
