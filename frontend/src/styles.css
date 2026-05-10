@@ -468,6 +468,7 @@ select:focus {
   cursor: pointer;
 }
 
+.graph-svg .node:hover path,
 .graph-svg .node:hover circle {
   filter: brightness(1.1);
 }

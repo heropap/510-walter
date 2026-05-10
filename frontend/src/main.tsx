@@ -10,6 +10,15 @@ const TEXTBOOK_COLORS = ["#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", 
 const BODY_SYSTEMS = ["全部", "呼吸系统", "循环系统", "消化系统", "神经系统", "免疫系统", "感染病", "全身/通用"];
 const STAGE_ORDER = ["正常结构", "正常功能", "感染传播", "病理形态", "病理生理", "临床应用"];
 const SCALE_ORDER = ["宏观解剖", "器官", "组织", "细胞", "分子", "病原体", "疾病/临床"];
+const CATEGORY_SYMBOLS: Record<string, d3.SymbolType> = {
+  疾病: d3.symbolTriangle,
+  解剖结构: d3.symbolCircle,
+  病原体: d3.symbolSquare,
+  生理功能: d3.symbolDiamond,
+  病理机制: d3.symbolCross,
+  治疗预防: d3.symbolWye,
+  诊断检查: d3.symbolStar
+};
 
 type ViewMode = "graph" | "location" | "timeline" | "hierarchy";
 
@@ -173,6 +182,10 @@ function GraphCanvas({
     const maxFrequency = d3.max(nodes, (node) => node.frequency) || 1;
     const radius = d3.scaleSqrt().domain([1, maxFrequency]).range([7, 22]);
     const color = d3.scaleOrdinal<string, string>().domain(graph.nodes.map((node) => node.source_textbooks?.[0] || "整合")).range(TEXTBOOK_COLORS);
+    const symbol = d3
+      .symbol<SimNode>()
+      .type((d) => CATEGORY_SYMBOLS[d.category] || d3.symbolStar)
+      .size((d) => Math.PI * radius(d.frequency) * radius(d.frequency) * 1.8);
 
     const link = root
       .append("g")
@@ -219,8 +232,8 @@ function GraphCanvas({
       });
 
     node
-      .append("circle")
-      .attr("r", (d) => radius(d.frequency))
+      .append("path")
+      .attr("d", symbol)
       .attr("fill", (d) => (d.source_textbooks?.length > 1 ? "#ff6b6b" : color(d.source_textbooks?.[0] || "整合")))
       .attr("stroke", (d) => (selected?.id === d.id ? "#111827" : "#ffffff"))
       .attr("stroke-width", (d) => (selected?.id === d.id ? 3 : 1.6));
@@ -261,7 +274,8 @@ function GraphCanvas({
 
     node.append("title").text((d) => {
       const childCount = (childIdsByParent.get(d.id) || []).filter((childId) => scopedNodeIds.has(childId)).length;
-      return childCount > 0 ? `${d.name} · ${childCount} 个子节点` : d.name;
+      const detail = `${d.name}\n${d.category} · ${d.body_system}\n${d.definition || d.evidence || "暂无定义"}`;
+      return childCount > 0 ? `${detail}\n${childCount} 个子节点` : detail;
     });
 
     const simulation = d3
@@ -312,10 +326,10 @@ function TextbookPanel({
       </div>
       <label className={`upload-box ${importing ? "busy" : ""}`} aria-busy={importing}>
         <UploadCloud size={22} />
-        <span>{importing ? "正在导入..." : "上传 PDF / DOCX / MD"}</span>
+        <span>{importing ? "正在导入..." : "上传 PDF / DOCX / Excel / MD"}</span>
         <input
           type="file"
-          accept=".md,.markdown,.txt,.pdf,.docx"
+          accept=".md,.markdown,.txt,.pdf,.docx,.xlsx,.xls,.csv"
           disabled={importing}
           onChange={(event) => {
             const file = event.target.files?.[0];
@@ -335,7 +349,7 @@ function TextbookPanel({
           <li className={importing || importState.status === "success" ? "active" : ""}>生成教材知识图谱</li>
           <li className={importing || importState.status === "success" ? "active" : ""}>刷新整合图谱和本地 RAG 索引</li>
         </ol>
-        {importState.message ? <p>{importState.message}</p> : <p className="muted">支持 Markdown、TXT、PDF、DOCX。</p>}
+        {importState.message ? <p>{importState.message}</p> : <p className="muted">支持 Markdown、TXT、PDF、DOCX、XLSX/XLS、CSV。</p>}
         {importState.fileName ? <small>{importState.fileName}</small> : null}
       </div>
       <div className="book-list">

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import shutil
 import subprocess
@@ -24,6 +25,7 @@ from .text_processing import (
     chunk_text,
     compact_evidence,
     definition_from_content,
+    extract_definition_candidates,
     normalize_name,
     parse_markdown_note,
     stable_id,
@@ -469,6 +471,61 @@ def build_textbook_graph(textbook_id: str) -> dict[str, Any]:
                     as_json({"path": chapter["path"], "char_count": chapter["char_count"]}),
                 ),
             )
+            for index, candidate in enumerate(extract_definition_candidates(title, content, limit=3), start=1):
+                candidate_name = candidate["name"]
+                candidate_definition = candidate["definition"]
+                candidate_evidence = candidate["evidence"]
+                candidate_id = stable_id(textbook_id, chapter["id"], candidate_name, index, prefix="node_def_")
+                candidate_labels = classify_node(candidate_name, candidate_definition, textbook_title)
+                conn.execute(
+                    """
+                    INSERT INTO nodes (
+                      id,textbook_id,name,definition,category,body_system,organ,anatomical_region,
+                      scale_level,stage,importance,frequency,evidence,chapter_id,chapter_title,
+                      source_textbooks,method,confidence,metadata
+                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    """,
+                    (
+                        candidate_id,
+                        textbook_id,
+                        candidate_name,
+                        candidate_definition,
+                        candidate_labels["category"],
+                        candidate_labels["body_system"],
+                        candidate_labels["organ"],
+                        candidate_labels["anatomical_region"],
+                        candidate_labels["scale_level"],
+                        candidate_labels["stage"],
+                        "medium",
+                        1,
+                        candidate_evidence,
+                        chapter["id"],
+                        title,
+                        as_json([textbook_title]),
+                        "rule_definition_sentence",
+                        0.79,
+                        as_json({"path": chapter["path"], "parent_chapter_node": node_id}),
+                    ),
+                )
+                conn.execute(
+                    """
+                    INSERT INTO edges (id,source,target,relation_type,medical_relation_type,description,confidence,evidence,textbook_id,chapter_title,method)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?)
+                    """,
+                    (
+                        stable_id(node_id, candidate_id, "defines", prefix="edge_"),
+                        node_id,
+                        candidate_id,
+                        "defines",
+                        "definition_of",
+                        "定义句抽取显示该章节解释了该知识点。",
+                        0.78,
+                        candidate_evidence,
+                        textbook_id,
+                        title,
+                        "definition_sentence_rule",
+                    ),
+                )
             sibling_groups[chapter["parent_id"] or "root"].append(node_id)
 
         edge_seen: set[tuple[str, str, str]] = set()
@@ -932,6 +989,7 @@ class DeepSeekClient:
         }
 
     def verify_candidates(self, textbook_title: str, candidates: list[dict[str, Any]]) -> dict[str, Any]:
+        """Ask DeepSeek to keep evidence-backed medical concepts and enrich graph labels."""
         if not self.ready:
             return {"used_llm": False, "nodes": candidates, "error": "DeepSeek is not configured"}
         prompt = {
@@ -953,15 +1011,27 @@ class DeepSeekClient:
             messages=[
                 {
                     "role": "system",
-                    "content": "你是医学教材知识图谱构建专家。只返回 JSON，不要输出解释。",
+                    "content": (
+                        "你是医学教材知识图谱构建专家。只返回严格 JSON，不要输出解释或 Markdown。"
+                        "必须遵守防幻觉规则：definition、category、body_system、scale_level、stage 都只能根据 evidence 判断；"
+                        "如果 evidence 不足以支持候选是医学知识点，keep=false；不要补写证据外的新事实。"
+                    ),
                 },
                 {
                     "role": "user",
                     "content": (
-                        "请审核候选知识点，补全 category/body_system/scale_level/stage/importance，"
+                        "请审核候选知识点，补全 category/body_system/scale_level/stage/importance。\n"
                         "输出格式 {\"nodes\":[{\"id\":\"...\",\"keep\":true,\"definition\":\"...\","
                         "\"category\":\"...\",\"body_system\":\"...\",\"scale_level\":\"...\","
-                        "\"stage\":\"...\",\"importance\":\"high|medium|low\",\"reason\":\"...\"}]}。\n"
+                        "\"stage\":\"...\",\"importance\":\"high|medium|low\",\"reason\":\"...\"}]}。\n\n"
+                        "Few-shot 示例：\n"
+                        "输入：{\"textbook\":\"组织学与胚胎学\",\"candidates\":[{\"id\":\"n1\",\"name\":\"肺泡\","
+                        "\"definition\":\"肺泡是肺进行气体交换的基本结构。\",\"evidence\":\"肺泡是肺进行气体交换的基本结构，由肺泡上皮和毛细血管共同参与气体交换。\"}]}\n"
+                        "输出：{\"nodes\":[{\"id\":\"n1\",\"keep\":true,\"definition\":\"肺泡是肺进行气体交换的基本结构。\","
+                        "\"category\":\"解剖结构\",\"body_system\":\"呼吸系统\",\"scale_level\":\"组织\","
+                        "\"stage\":\"正常结构\",\"importance\":\"high\",\"reason\":\"evidence 明确给出定义和功能。\"}]}\n\n"
+                        "反例：若 evidence 只是章节标题或无法支撑定义，输出 keep=false。\n\n"
+                        "现在请处理：\n"
                         + json.dumps(prompt, ensure_ascii=False)
                     ),
                 },
@@ -1152,7 +1222,7 @@ def rag_status() -> dict[str, Any]:
     }
 
 
-def local_search(question: str, limit: int = 5) -> list[dict[str, Any]]:
+def search_terms(question: str) -> list[str]:
     terms = [term for term in re.split(r"\s+|，|。|,|？|\?", question) if 2 <= len(term) <= 12]
     cjk = "".join(re.findall(r"[\u4e00-\u9fff]+", question))
     priority_terms = [term for term in ["肺炎", "低氧血症", "低氧", "血氧", "肺泡", "通气", "血流", "炎症", "机制"] if term in question]
@@ -1165,29 +1235,99 @@ def local_search(question: str, limit: int = 5) -> list[dict[str, Any]]:
     terms = list(dict.fromkeys(terms))[:80]
     if not terms and question:
         terms = [question[:8]]
+    return [*priority_terms, *terms]
+
+
+def bm25_tokens(text: str) -> list[str]:
+    cjk = "".join(re.findall(r"[\u4e00-\u9fff]+", text))
+    tokens = re.findall(r"[a-zA-Z0-9]{2,}", text.lower())
+    for size in (2, 3):
+        tokens.extend(cjk[index : index + size] for index in range(0, max(len(cjk) - size + 1, 0)))
+    return tokens
+
+
+def bm25_score_rows(question: str, rows: list[Any]) -> dict[str, float]:
+    query_tokens = bm25_tokens(question)
+    if not query_tokens or not rows:
+        return {}
+    documents = [bm25_tokens(f"{from_json(row['metadata'], {}).get('chapter', '')} {row['text']}") for row in rows]
+    try:
+        from rank_bm25 import BM25Okapi
+
+        scores = BM25Okapi(documents).get_scores(query_tokens)
+        return {row["id"]: float(score) for row, score in zip(rows, scores) if score > 0}
+    except Exception:
+        doc_freq: Counter[str] = Counter()
+        for tokens in documents:
+            doc_freq.update(set(tokens))
+        avg_len = sum(len(tokens) for tokens in documents) / max(len(documents), 1)
+        k1 = 1.5
+        b = 0.75
+        scores: dict[str, float] = {}
+        for row, tokens in zip(rows, documents):
+            counts = Counter(tokens)
+            doc_len = len(tokens) or 1
+            score = 0.0
+            for token in query_tokens:
+                freq = counts[token]
+                if not freq:
+                    continue
+                idf = math.log(1 + (len(documents) - doc_freq[token] + 0.5) / (doc_freq[token] + 0.5))
+                score += idf * (freq * (k1 + 1)) / (freq + k1 * (1 - b + b * doc_len / max(avg_len, 1)))
+            if score > 0:
+                scores[row["id"]] = score
+        return scores
+
+
+def citation_from_row(row: Any, score: float, method: str) -> dict[str, Any]:
+    meta = from_json(row["metadata"], {})
+    return {
+        "textbook": meta.get("textbook", row["textbook_id"]),
+        "chapter": meta.get("chapter", row["chapter_id"]),
+        "relevance_score": min(0.99, 0.45 + score * 0.5),
+        "retrieval_method": method,
+        "chunk_preview": compact_evidence(row["text"], 220),
+    }
+
+
+def local_search_bm25(question: str, limit: int = 5) -> list[dict[str, Any]]:
+    """Return BM25-ranked citations for the local RAG fallback path."""
     with db() as conn:
         rows = conn.execute("SELECT * FROM rag_chunks LIMIT 2500").fetchall()
-    scored: list[tuple[int, Any]] = []
+    scores = bm25_score_rows(question, rows)
+    by_id = {row["id"]: row for row in rows}
+    max_score = max(scores.values(), default=1.0)
+    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)[:limit]
+    return [citation_from_row(by_id[row_id], score / max_score, "bm25") for row_id, score in ranked]
+
+
+def local_search(question: str, limit: int = 5) -> list[dict[str, Any]]:
+    """Hybrid local retrieval: keyword evidence count + BM25 ranking over RAG chunks."""
+    terms = search_terms(question)
+    priority_terms = [term for term in ["肺炎", "低氧血症", "低氧", "血氧", "肺泡", "通气", "血流", "炎症", "机制"] if term in question]
+    with db() as conn:
+        rows = conn.execute("SELECT * FROM rag_chunks LIMIT 2500").fetchall()
+    keyword_scores: dict[str, int] = {}
     for row in rows:
         meta = from_json(row["metadata"], {})
         scoped = f"{meta.get('chapter', '')} {row['text']}"
         score = sum(scoped.count(term) for term in terms)
         score += sum(scoped.count(term) * 12 for term in priority_terms)
         if score:
-            scored.append((score, row))
-    scored.sort(key=lambda item: item[0], reverse=True)
-    citations = []
-    for score, row in scored[:limit]:
-        meta = from_json(row["metadata"], {})
-        citations.append(
-            {
-                "textbook": meta.get("textbook", row["textbook_id"]),
-                "chapter": meta.get("chapter", row["chapter_id"]),
-                "relevance_score": min(0.99, 0.45 + score * 0.08),
-                "chunk_preview": compact_evidence(row["text"], 220),
-            }
-        )
-    return citations
+            keyword_scores[row["id"]] = score
+    bm25_scores = bm25_score_rows(question, rows)
+    max_keyword = max(keyword_scores.values(), default=1)
+    max_bm25 = max(bm25_scores.values(), default=1.0)
+    combined: list[tuple[float, Any, str]] = []
+    for row in rows:
+        keyword_score = keyword_scores.get(row["id"], 0) / max_keyword
+        bm25_score = bm25_scores.get(row["id"], 0.0) / max_bm25
+        score = keyword_score * 0.55 + bm25_score * 0.45
+        if score:
+            method = "keyword+bm25" if keyword_score and bm25_score else "keyword" if keyword_score else "bm25"
+            combined.append((score, row, method))
+    combined.sort(key=lambda item: item[0], reverse=True)
+    return [citation_from_row(row, score, method) for score, row, method in combined[:limit]]
 
 
 async def rag_query(question: str, conversation_id: str | None = None) -> dict[str, Any]:

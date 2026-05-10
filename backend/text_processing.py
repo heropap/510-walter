@@ -10,6 +10,7 @@ FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n", re.S)
 TITLE_RE = re.compile(r"^title:\s*(.+?)\s*$", re.M)
 HEADING_RE = re.compile(r"^#\s+(.+?)\s*$", re.M)
 OBSIDIAN_LINK_RE = re.compile(r"\[\[(?:[^|\]]+\|)?([^\]]+)\]\]")
+DEFINITION_VERBS = ("是指", "定义为", "称为", "是", "指", "由")
 
 
 def stable_id(*parts: object, prefix: str = "") -> str:
@@ -84,6 +85,43 @@ def definition_from_content(title: str, content: str) -> str:
     return compact_evidence(content, 140)
 
 
+def extract_definition_candidates(chapter_title: str, content: str, limit: int = 4) -> list[dict[str, str]]:
+    """Extract definition-like concepts from short evidence sentences in a chapter."""
+    candidates: list[dict[str, str]] = []
+    seen: set[str] = set()
+    sentences = re.findall(r"[^。\n；;]{10,220}[。；;]", content[:9000])
+    blocked_names = {"本节", "本章", "其", "它", "这种", "这些", "上述", "主要"}
+    for sentence in sentences:
+        verb = next((item for item in DEFINITION_VERBS if item in sentence), "")
+        if not verb:
+            continue
+        if verb == "由" and not any(word in sentence for word in ("组成", "构成", "形成")):
+            continue
+        left = sentence.split(verb, 1)[0].strip()
+        raw_name = re.split(r"[，,：:、\s]", left)[-1]
+        raw_name = re.sub(r"^(所谓|通常|一般|其中|包括)", "", raw_name)
+        name = clean_title(raw_name)
+        name = re.sub(r"^[的其该此]", "", name).strip()
+        normalized = normalize_name(name)
+        if not (2 <= len(normalized) <= 24):
+            continue
+        if name in blocked_names or normalized == normalize_name(chapter_title):
+            continue
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        candidates.append(
+            {
+                "name": name,
+                "definition": compact_evidence(sentence, 170),
+                "evidence": compact_evidence(sentence, 190),
+            }
+        )
+        if len(candidates) >= limit:
+            break
+    return candidates
+
+
 def chunk_text(text: str, chunk_size: int = 700, overlap: int = 100) -> Iterable[tuple[int, int, str]]:
     if not text:
         return
@@ -97,4 +135,3 @@ def chunk_text(text: str, chunk_size: int = 700, overlap: int = 100) -> Iterable
         if end >= len(text):
             break
         start += step
-
