@@ -154,12 +154,11 @@ function GraphCanvas({
       .slice(0, 560);
 
     const root = svg.append("g");
-    svg.call(
-      d3
-        .zoom<SVGSVGElement, unknown>()
-        .scaleExtent([0.35, 4])
-        .on("zoom", (event) => root.attr("transform", event.transform))
-    );
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.35, 4])
+      .on("zoom", (event) => root.attr("transform", event.transform));
+    svg.call(zoom);
 
     svg
       .append("defs")
@@ -226,6 +225,10 @@ function GraphCanvas({
       )
       .on("click", (_event, d) => {
         onSelect(d);
+        const scale = d3.zoomTransform(svg.node()!).k;
+        const tx = width / 2 - (d.x || 0) * scale;
+        const ty = height / 2 - (d.y || 0) * scale;
+        svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
         if ((childIdsByParent.get(d.id) || []).some((childId) => scopedNodeIds.has(childId))) {
           onToggleNode(d.id);
         }
