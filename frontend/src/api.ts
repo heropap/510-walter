@@ -26,7 +26,13 @@ export const api = {
   upload: (file: File) => {
     const form = new FormData();
     form.append("file", file);
-    return request<{ textbook: Textbook; graph_stats: Record<string, unknown> }>("/api/upload", {
+    return request<{
+      textbook: Textbook;
+      graph_stats: Record<string, unknown>;
+      merged_stats?: Record<string, unknown>;
+      rag_index?: Record<string, unknown>;
+      dify_sync?: Record<string, unknown>;
+    }>("/api/upload", {
       method: "POST",
       body: form
     });

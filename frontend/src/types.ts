@@ -65,9 +65,20 @@ export interface Decision {
 
 export interface RagResponse {
   answer: string;
-  citations: Array<Record<string, unknown>>;
+  citations: RagCitation[];
   conversation_id?: string | null;
   provider: string;
+}
+
+export interface RagCitation {
+  content?: string;
+  dataset_name?: string;
+  document_name?: string;
+  score?: number;
+  segment_id?: string;
+  segment_position?: number;
+  title?: string;
+  [key: string]: unknown;
 }
 
 export interface ConfigStatus {
@@ -88,4 +99,3 @@ export interface ConfigStatus {
     stats: Record<string, number | boolean>;
   };
 }
-

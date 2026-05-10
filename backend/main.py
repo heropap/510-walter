@@ -32,6 +32,7 @@ from .services import (
     list_textbooks,
     rag_query,
     rag_status,
+    sync_textbook_to_dify,
     update_decision,
     ensure_merged_graph,
 )
@@ -136,12 +137,21 @@ def create_app() -> FastAPI:
         return integration_stats()
 
     @app.post("/api/rag/index")
-    def api_rag_index() -> dict[str, Any]:
-        return build_rag_index()
+    def api_rag_index(
+        sync_dify: bool = Query(True),
+        sync_all: bool = Query(True),
+        limit: int | None = Query(None, ge=1, le=10000),
+        batch_size: int = Query(5000, ge=1, le=10000),
+    ) -> dict[str, Any]:
+        return build_rag_index(sync_dify=sync_dify, sync_all=sync_all, limit=limit, batch_size=batch_size)
 
     @app.get("/api/rag/status")
     def api_rag_status() -> dict[str, Any]:
         return rag_status()
+
+    @app.post("/api/rag/sync/{textbook_id}")
+    def api_rag_sync_textbook(textbook_id: str, batch_size: int = Query(5000, ge=1, le=10000)) -> dict[str, Any]:
+        return sync_textbook_to_dify(textbook_id, batch_size=batch_size)
 
     @app.post("/api/rag/query")
     async def api_rag_query(payload: RagQuery) -> dict[str, Any]:

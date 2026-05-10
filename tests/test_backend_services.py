@@ -24,9 +24,8 @@ def test_sample_textbooks_and_graphs_load() -> None:
 def test_rag_chunks_are_generated() -> None:
     init_db()
     initialize_app_data()
-    result = build_rag_index()
+    result = build_rag_index(sync_dify=False)
     assert result["status"] == "indexed"
     assert result["chunks"] > 0
     stats = integration_stats()
     assert stats["rag_chunks"] > 0
-

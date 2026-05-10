@@ -102,6 +102,7 @@ def delete_textbook(textbook_id: str) -> dict[str, Any]:
             raise HTTPException(status_code=404, detail="Textbook not found")
         conn.execute("DELETE FROM textbooks WHERE id = ?", (textbook_id,))
     ensure_merged_graph()
+    build_rag_index(sync_dify=False)
     return {"deleted": textbook_id}
 
 
@@ -211,6 +212,25 @@ def load_chapters_from_split_dir(textbook_id: str, split_path: Path) -> list[dic
     return chapters
 
 
+def fallback_full_text_chapter(textbook_id: str, markdown_path: Path) -> list[dict[str, Any]]:
+    content = markdown_path.read_text(encoding="utf-8", errors="ignore").strip()
+    if not content:
+        raise HTTPException(status_code=400, detail="文件转换后没有可导入的文本内容。")
+    title = re.sub(r"^\d+_", "", markdown_path.stem) or "全文"
+    return [
+        {
+            "id": stable_id(textbook_id, "full_text", prefix="ch_"),
+            "title": title,
+            "level": 1,
+            "parent_id": None,
+            "path": str(markdown_path),
+            "content": content,
+            "sort_order": 1,
+            "metadata": {"relative_path": markdown_path.name, "fallback": True},
+        }
+    ]
+
+
 async def handle_upload(file: UploadFile) -> dict[str, Any]:
     settings = get_settings()
     filename = Path(file.filename or "uploaded.md").name
@@ -252,6 +272,8 @@ async def handle_upload(file: UploadFile) -> dict[str, Any]:
             generated.rename(split_target)
 
     chapters = load_chapters_from_split_dir(textbook_id, split_target)
+    if not chapters:
+        chapters = fallback_full_text_chapter(textbook_id, markdown_path)
     with db() as conn:
         conn.execute(
             """
@@ -295,37 +317,54 @@ async def handle_upload(file: UploadFile) -> dict[str, Any]:
                 ),
             )
     graph = build_textbook_graph(textbook_id)
-    return {"textbook": get_textbook(textbook_id), "graph_stats": graph["stats"]}
+    merged_graph = ensure_merged_graph()
+    rag_index = build_rag_index(sync_dify=False)
+    dify_sync = sync_textbook_to_dify(textbook_id)
+    return {
+        "textbook": get_textbook(textbook_id),
+        "graph_stats": graph["stats"],
+        "merged_stats": merged_graph["stats"],
+        "rag_index": rag_index,
+        "dify_sync": dify_sync,
+    }
 
 
 def find_markitdown_bin() -> str | None:
     settings = get_settings()
     candidates = [
         settings.markitdown_bin,
+        str(settings.root_dir / ".venv" / "bin" / "markitdown"),
         shutil.which("markitdown"),
         "/Users/walter/.local/bin/markitdown",
     ]
     for candidate in candidates:
-        if candidate and Path(candidate).exists():
-            return candidate
+        if not candidate:
+            continue
+        resolved = shutil.which(candidate) if not Path(candidate).is_absolute() else candidate
+        if resolved and Path(resolved).exists():
+            return resolved
     return None
 
 
 def convert_with_markitdown(source: Path, target: Path) -> None:
+    package_error: Exception | None = None
     try:
         from markitdown import MarkItDown
 
         result = MarkItDown(enable_plugins=False).convert(source)
         target.write_text(result.text_content, encoding="utf-8")
         return
-    except Exception:
-        pass
+    except Exception as exc:
+        package_error = exc
 
     markitdown_bin = find_markitdown_bin()
     if not markitdown_bin:
+        detail = "当前环境未找到 MarkItDown CLI。请安装 Python 包或设置 MARKITDOWN_BIN 指向本地 markitdown CLI。"
+        if package_error:
+            detail = f"MarkItDown Python 包转换失败，且未找到 CLI fallback: {str(package_error)[:500]}"
         raise HTTPException(
             status_code=400,
-            detail="当前环境未找到 MarkItDown。请安装 Python 包或设置 MARKITDOWN_BIN 指向本地 markitdown CLI。",
+            detail=detail,
         )
     completed = subprocess.run(
         [markitdown_bin, str(source), "-o", str(target)],
@@ -814,7 +853,12 @@ async def extract_knowledge(textbook_id: str, use_llm: bool = True) -> dict[str,
     return {"status": "ready", "graph": graph, "llm": llm_result}
 
 
-def build_rag_index() -> dict[str, Any]:
+def build_rag_index(
+    sync_dify: bool = True,
+    sync_all: bool = True,
+    limit: int | None = None,
+    batch_size: int = 5000,
+) -> dict[str, Any]:
     with db() as conn:
         conn.execute("DELETE FROM rag_chunks")
         textbooks = conn.execute("SELECT id,title FROM textbooks ORDER BY id").fetchall()
@@ -845,46 +889,117 @@ def build_rag_index() -> dict[str, Any]:
                     )
                     count += 1
     settings = get_settings()
-    dify_sync = {"status": "skipped", "reason": "Dify knowledge API is not configured"}
-    if settings.dify_knowledge_ready:
-        dify_sync = sync_chunks_to_dify(limit=80)
+    dify_sync = {"status": "skipped", "reason": "Dify sync was not requested"}
+    if sync_dify:
+        if settings.dify_knowledge_ready:
+            sync_limit = None if sync_all else limit or 80
+            dify_sync = sync_chunks_to_dify(limit=sync_limit, batch_size=batch_size)
+        else:
+            dify_sync = {"status": "skipped", "reason": "Dify knowledge API is not configured"}
     return {
         "status": "indexed",
         "chunks": count,
         "dify_chat_configured": settings.dify_chat_ready,
         "dify_knowledge_configured": settings.dify_knowledge_ready,
         "dify_sync": dify_sync,
-        "message": "本地 chunk 已生成；配置 Dify 知识库凭证后可同步到 Dify。",
+        "message": "本地 chunk 已生成；Dify 已配置时会按批次同步到知识库。",
     }
 
 
-def sync_chunks_to_dify(limit: int = 80) -> dict[str, Any]:
+def dify_exception_message(exc: Exception) -> str:
+    if isinstance(exc, httpx.HTTPStatusError):
+        text = exc.response.text.strip()
+        return f"{exc.response.status_code} {exc.response.reason_phrase}: {text[:500]}"
+    return str(exc)
+
+
+def sync_textbook_to_dify(textbook_id: str, batch_size: int = 5000) -> dict[str, Any]:
+    with db() as conn:
+        textbook = conn.execute("SELECT id,title FROM textbooks WHERE id = ?", (textbook_id,)).fetchone()
+        if not textbook:
+            raise HTTPException(status_code=404, detail="Textbook not found")
+        rows = conn.execute(
+            "SELECT * FROM rag_chunks WHERE textbook_id = ? ORDER BY chapter_id, char_start",
+            (textbook_id,),
+        ).fetchall()
+    return sync_rows_to_dify(
+        rows=rows,
+        batch_size=batch_size,
+        name_prefix=f"学科知识整合智能体-导入教材-{textbook['title']}",
+    )
+
+
+def sync_chunks_to_dify(limit: int | None = None, batch_size: int = 5000) -> dict[str, Any]:
     settings = get_settings()
     if not settings.dify_knowledge_ready:
         return {"status": "skipped", "reason": "Dify knowledge API is not configured"}
     with db() as conn:
-        rows = conn.execute("SELECT * FROM rag_chunks ORDER BY id LIMIT ?", (limit,)).fetchall()
+        if limit is None:
+            rows = conn.execute("SELECT * FROM rag_chunks ORDER BY textbook_id, chapter_id, char_start").fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM rag_chunks ORDER BY textbook_id, chapter_id, char_start LIMIT ?",
+                (limit,),
+            ).fetchall()
+    return sync_rows_to_dify(rows=rows, batch_size=batch_size, name_prefix="学科知识整合智能体-教材全量")
+
+
+def sync_rows_to_dify(rows: list[Any], batch_size: int = 5000, name_prefix: str = "学科知识整合智能体-教材分块") -> dict[str, Any]:
+    settings = get_settings()
+    if not settings.dify_knowledge_ready:
+        return {"status": "skipped", "reason": "Dify knowledge API is not configured"}
+    batch_size = min(max(batch_size, 1), 10000)
     if not rows:
         return {"status": "skipped", "reason": "No local chunks to sync"}
-    text = "\n\n---\n\n".join(row["text"] for row in rows)
-    payload = {
-        "name": "学科知识整合智能体-教材分块样例",
-        "text": text,
-        "indexing_technique": "high_quality",
-        "process_rule": {"mode": "automatic"},
+    batches = [rows[index : index + batch_size] for index in range(0, len(rows), batch_size)]
+    synced: list[dict[str, Any]] = []
+    failed: list[dict[str, Any]] = []
+    with httpx.Client(timeout=120) as client:
+        for batch_index, batch in enumerate(batches, start=1):
+            text = "\n\n---\n\n".join(row["text"] for row in batch)
+            payload = {
+                "name": f"{name_prefix}-{batch_index:03d}",
+                "text": text,
+                "indexing_technique": "high_quality",
+                "process_rule": {"mode": "automatic"},
+            }
+            first_meta = from_json(batch[0]["metadata"], {})
+            last_meta = from_json(batch[-1]["metadata"], {})
+            batch_summary = {
+                "batch": batch_index,
+                "chunks": len(batch),
+                "first": f"{first_meta.get('textbook', batch[0]['textbook_id'])}/{first_meta.get('chapter', batch[0]['chapter_id'])}",
+                "last": f"{last_meta.get('textbook', batch[-1]['textbook_id'])}/{last_meta.get('chapter', batch[-1]['chapter_id'])}",
+            }
+            try:
+                response = client.post(
+                    f"{settings.dify_base_url}/datasets/{settings.dify_dataset_id}/document/create-by-text",
+                    headers={"Authorization": f"Bearer {settings.dify_knowledge_api_key}"},
+                    json=payload,
+                )
+                response.raise_for_status()
+                data = response.json()
+                document = data.get("document", {}) if isinstance(data, dict) else {}
+                synced.append(
+                    {
+                        **batch_summary,
+                        "document_id": document.get("id"),
+                        "indexing_status": document.get("indexing_status"),
+                    }
+                )
+            except Exception as exc:
+                failed.append({**batch_summary, "error": dify_exception_message(exc)})
+    status = "synced" if not failed else "partial_failed" if synced else "failed"
+    return {
+        "status": status,
+        "chunks_sent": sum(item["chunks"] for item in synced),
+        "chunks_failed": sum(item["chunks"] for item in failed),
+        "batches_total": len(batches),
+        "batches_synced": len(synced),
+        "batches_failed": len(failed),
+        "documents": synced[:20],
+        "errors": failed[:10],
     }
-    try:
-        with httpx.Client(timeout=90) as client:
-            response = client.post(
-                f"{settings.dify_base_url}/datasets/{settings.dify_dataset_id}/document/create-by-text",
-                headers={"Authorization": f"Bearer {settings.dify_knowledge_api_key}"},
-                json=payload,
-            )
-            response.raise_for_status()
-            data = response.json()
-        return {"status": "synced", "chunks_sent": len(rows), "response": data}
-    except Exception as exc:
-        return {"status": "failed", "chunks_sent": len(rows), "error": str(exc)}
 
 
 def rag_status() -> dict[str, Any]:
